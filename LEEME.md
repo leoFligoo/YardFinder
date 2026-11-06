@@ -33,7 +33,7 @@ Archivos para desarrollar la UI:
 - `interfaz.html`: pantalla principal, estilos y JavaScript.
 - `plantilla_mapa.html`: mapa exportado con Leaflet.
 - `interfaz.py`: servidor y endpoints `/api/config`, `/api/videos`, `/api/resultados` y `/api/estado`.
-- `output/imagegen/yard-finder-demo-v2/`: diseños de referencia (chat, máximo 8 autos por camión y ruta sugerida).
+- `output/imagegen/yard-finder-demo-v3/`: diseños de referencia (chat, máximo 8 autos por camión y ruta sugerida sobre una imagen cenital simulada).
 
 La aplicación usa Leaflet 1.9.4 desde `vendor/leaflet`, fotos y polígonos locales; no carga mosaicos satelitales
 ni bibliotecas desde CDN. Los mapas nuevos incluyen una copia de esos recursos. Los ejemplos originales

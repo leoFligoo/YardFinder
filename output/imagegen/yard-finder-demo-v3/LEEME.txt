@@ -1,0 +1,23 @@
+YARD FINDER — DEMO V3
+
+9 mockups visuales; no es una aplicación funcional. Generados/editados con Imagegen integrado.
+
+Cambios: máximo 8 autos por camión; pedido y modificaciones del recorrido por chat; ruta sugerida con línea continua y autos seleccionados numerados; validación de pedidos que exceden capacidad, sin descarte automático.
+
+Escenario: CAM-024, 8 Cronos blancos: tags #042–#045 del sector 4 y #046–#049 del sector 5. Inventario de referencia: 200 registrados, 192 ubicados, 8 sin ubicar. Los números del inventario no indican capacidad del camión.
+
+01 Patio: acceso a planificar por chat.
+02 Inventario: selección enviada al chat.
+03 Detalle: vehículo enviado al chat.
+04 Chat de despacho: pedido válido y selección de 8 autos.
+05 Recorrido: línea sugerida, inicio/salida y 8 autos numerados.
+06 Pasadas del dron: sin cambios.
+07 Excepciones: sin cambios.
+08 Reporte: capacidad 8/8 y origen en chat.
+09 Chat: pedido de 12, máximo 8, excedente 4, sin recorrido hasta ajustar solicitud.
+
+Datos, VINs, tags y mapas ilustrativos. No son pruebas de detección, capacidad geométrica real del patio ni rendimiento. La ruta real debe calcularse con el grafo de pasillos y restricciones del camión. No hay integración de Claude implementada en estos mockups.
+
+La versión anterior se conserva. Prompts y correcciones: prompts.json.
+
+CAMBIO V3: las pantallas 04 (chat) y 05 (recorrido) usan una imagen cenital fotorealista simulada con ruta y autos resaltados sobre la imagen. No es una captura real del DJI Air 3S. Las otras siete pantallas se conservan de v2.

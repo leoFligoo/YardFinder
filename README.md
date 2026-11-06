@@ -26,8 +26,9 @@ Ver [LEEME.md](LEEME.md) para configuración, procesamiento de fotos/video y com
 - Diseñado, pendiente de implementar: despacho por chat, capacidad máxima de 8 autos por camión y recorrido
   sugerido con cada vehículo seleccionado marcado en el mapa.
 
-Los [mockups v2](output/imagegen/yard-finder-demo-v2) son referencias visuales con datos simulados.
-También están disponibles como [ZIP](output/imagegen/yard-finder-demo-v2.zip).
+Los [mockups v3](output/imagegen/yard-finder-demo-v3) son referencias visuales con datos simulados.
+El chat y el recorrido muestran una imagen cenital simulada del patio, con la ruta y los ocho autos
+seleccionados superpuestos. También están disponibles como [ZIP](output/imagegen/yard-finder-demo-v3.zip).
 
 ## Estructura para frontend
 
