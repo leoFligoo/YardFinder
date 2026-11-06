@@ -17,6 +17,7 @@ import errno
 import json
 import mimetypes
 import re
+import sqlite3
 import subprocess
 import sys
 import threading
@@ -25,11 +26,18 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-import procesar_vuelo as pv
+import despacho
+try:
+    import procesar_vuelo as pv
+except ImportError:
+    # Sin el stack del drone (cv2/numpy/PIL) la UI, el patio y el despacho por
+    # chat funcionan igual; solo el procesamiento de videos queda deshabilitado.
+    pv = None
 from inventario_ui import InventarioError, leer_patio, resolver_recorte
 
 PUERTO = 8765
-BASE = pv.BASE
+BASE = pv.BASE if pv else Path(__file__).resolve().parent
+HFOV_PRINCIPAL = pv.HFOV_PRINCIPAL if pv else 71.6
 SALIDA = BASE / "salida"
 CONFIG = BASE / "config.json"
 EXT_VIDEO = {".mp4", ".mov"}
@@ -38,14 +46,14 @@ DEFAULTS = {
     "carpeta_videos": "",
     "lotes": str(BASE / "lotes.geojson") if (BASE / "lotes.geojson").exists() else "",
     "camara": "principal",          # principal | tele | personalizada
-    "hfov": pv.HFOV_PRINCIPAL,
+    "hfov": HFOV_PRINCIPAL,
     "cada_m": 15.0,
     "alt_min": 10.0,
     "conf": 0.2,
     "yaw_modo": "auto",             # auto | fijo
     "yaw": 0.0,
 }
-HFOV_CAMARAS = {"principal": pv.HFOV_PRINCIPAL, "tele": 27.8}
+HFOV_CAMARAS = {"principal": HFOV_PRINCIPAL, "tele": 27.8}
 
 
 def leer_config():
@@ -102,6 +110,9 @@ class Trabajo:
         return True
 
     def _correr(self, videos, c):
+        if pv is None:
+            self.errores.append("El procesamiento de videos requiere OpenCV (cv2), no instalado.")
+            return
         hfov = HFOV_CAMARAS.get(c["camara"], c["hfov"])
         yaw = c["yaw"] if c["yaw_modo"] == "fijo" else None
         with contextlib.redirect_stdout(self):
@@ -289,6 +300,13 @@ class Manejador(BaseHTTPRequestHandler):
             if not TRABAJO.iniciar(videos):
                 return self._json({"error": "Ya hay un procesamiento en curso"}, 409)
             return self._json({"ok": True})
+        if ruta == "/api/despacho":
+            # "Planificar por chat": busca autos en inventario.db en lenguaje natural.
+            try:
+                res = despacho.planificar(BASE, datos.get("texto", ""))
+            except sqlite3.Error:
+                return self._json({"error": "No se pudo leer el inventario."}, 503)
+            return self._json(res, 200 if res.get("ok") else 400)
         self.send_error(404)
 
 
