@@ -34,12 +34,8 @@ distintos de los 6 lotes y 120 lugares configurados.
 - Vista cenital con las dos ortofotos locales, sectores, zoom y selección de autos.
 - Búsqueda por VIN, tag o ID (`#042`), filtro por sector, capas y restablecimiento de vista.
 - Recorte y datos de la observación seleccionada, accesibles también desde los resultados de búsqueda.
-- Lista de autos encontrados antes del mapa: coordenadas, modelo, color, VIN, AprilTag y patente.
-  Selección múltiple para despacho (máximo 8), conservada al filtrar, con chips para quitar autos
-  y resaltado azul en el mapa. Se mantiene en memoria durante la sesión, no después de recargar.
-  No genera todavía recorridos ni reserva vehículos en el inventario.
-  `posicion: {loteId, x, y}` representa una ubicación interna vinculada; el ejemplo actual no tiene
-  esa vinculación ni patente, y muestra «sin vincular»/«sin identificar» junto al GPS disponible.
+- El Patio inicial muestra el mapa y permite consultar observaciones. La selección múltiple
+  para despacho **no aparece en esta pantalla**.
 - Contadores calculados: 123 detecciones con coordenadas, 0 sin ubicación, 25 fuera de sector,
   5 sectores y 12 tags. **Estar fuera de un sector no significa carecer de ubicación.**
 - Diseño adaptable a escritorio y móvil; estados de carga, error con reintento y búsqueda vacía.
@@ -51,7 +47,14 @@ son los del ejemplo original. El enlace al mapa de resultados utiliza `salida/de
 por `preparar_demo.py` en la preparación local.
 
 Solo Patio está implementado en esta entrega. Los accesos restantes explican que están pendientes;
-el chat, la carga de hasta 8 autos y el recorrido se incorporan en sus siguientes PRs.
+el chat, la selección de hasta 8 autos y el recorrido se incorporan en sus siguientes PRs.
+
+El flujo de Despacho será: **búsqueda escrita en el chat → lista de coincidencias → selección
+manual de autos → recorrido sugerido**. Ejemplo: «Buscame los 5 Fiat Cronos blancos».
+La lista aparecerá solo después de esa búsqueda, con coordenadas, modelo, color, VIN, AprilTag
+y patente. La capacidad del camión sigue siendo de hasta 8 autos.
+El componente `web/vehicle-list.js` queda preparado, sin montar en Patio, para conectarlo a los
+resultados del chat en la PR de Despacho. No hay búsqueda por chat ni recorrido implementados aún.
 
 Validación (sin dependencias adicionales; Node solo se usa para las pruebas de JavaScript):
 
@@ -82,7 +85,7 @@ seleccionados superpuestos. También están disponibles como [ZIP](output/imageg
 | `web/app.js`, `web/map.js` | Pantalla Patio e interacción del mapa Leaflet |
 | `web/data.js`, `web/state.js` | Adaptador de datos y estado compartido para las siguientes pantallas |
 | `web/yard-layout.js` | Generador de 6 lotes × 20 posiciones con coordenadas locales X/Y |
-| `web/vehicle-list.js` | Lista de observaciones y selección de hasta 8 autos para despacho |
+| `web/vehicle-list.js` | Componente reservado para coincidencias del chat; no montado en Patio |
 | `web/data/patio.json` | Snapshot del ejemplo local con procedencia explícita |
 | `plantilla_mapa.html` | Mapa y buscador de vehículos |
 | `interfaz.py` | Servidor local y API |

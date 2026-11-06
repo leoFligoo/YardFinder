@@ -3,7 +3,7 @@ import {loadPatio, summarize, filterVehicles, assetUrl, hasLocation} from './dat
 import {state} from './state.js';
 import {createPatioMap} from './map.js';
 import {renderYardLayout} from './yard-layout.js';
-import {createVehicleList, coordinatesLabel} from './vehicle-list.js';
+import {coordinatesLabel} from './vehicle-list.js';
 
 const $ = id => document.getElementById(id);
 const text = (id, value) => { $(id).textContent = value; };
@@ -11,16 +11,13 @@ let patioMap;
 let imageFailed = false;
 renderIcons();
 renderYardLayout($('yard-layout'));
-const vehicleList = createVehicleList({state,
-  onChange: () => patioMap?.setDispatchIds(state.dispatchIds),
-  onInspect: id => {selectVehicle(id, true); $('vehicle-card').scrollIntoView({block: 'nearest'});},
-});
+
 
 const dialog = $('pending-dialog');
 document.querySelectorAll('[data-pending]').forEach(button => button.addEventListener('click', () => {
   text('pending-title', `${button.dataset.pending} · Próximamente`);
   text('pending-description', button.dataset.pending === 'Despacho'
-    ? (state.dispatchIds.length ? `Tenés ${state.dispatchIds.length} autos seleccionados. El chat y la generación del recorrido todavía no están disponibles en esta demo.` : 'Primero seleccioná hasta 8 autos en la lista de encontrados. El chat y la generación del recorrido todavía no están disponibles en esta demo.')
+    ? 'Primero ingresá tu búsqueda en el chat, por ejemplo: «Buscame los 5 Fiat Cronos blancos». Después podrás seleccionar hasta 8 autos entre las coincidencias y generar el recorrido. Despacho todavía no está disponible en esta demo.'
     : 'Esta sección todavía no está disponible en la demo. Podés seguir explorando los vehículos y sus observaciones en el mapa del patio.');
   dialog.showModal();
 }));
@@ -66,7 +63,6 @@ function update() {
   const autos = filterVehicles(state.data.autos, state);
   if (state.selectedId !== null && !autos.some(a => a.id === state.selectedId)) selectVehicle(null);
   patioMap.show(autos);
-  vehicleList.show(autos);
   text('result-count', `${autos.length} de ${state.data.autos.length} vehículos`);
   const message = $('map-message');
   message.hidden = autos.length > 0 && !imageFailed;
@@ -83,22 +79,16 @@ function update() {
     results.append(button);
   });
 }
-for (const id of ['search', 'vehicle-search']) {
-  $(id).addEventListener('input', e => {
-    state.query = e.target.value;
-    $('search').value = $('vehicle-search').value = state.query;
-    update();
-  });
-}
+$('search').addEventListener('input', e => {state.query = e.target.value; update();});
 $('sector-filter').addEventListener('change', e => {state.sector = e.target.value; update();});
 $('review-outside').addEventListener('click', () => {
   state.sector = '__outside'; state.query = '';
-  $('sector-filter').value = state.sector; $('search').value = $('vehicle-search').value = '';
+  $('sector-filter').value = state.sector; $('search').value = '';
   update(); patioMap.fit(); $('sector-filter').focus();
 });
 $('reset').addEventListener('click', () => {
   state.query = ''; state.sector = '';
-  $('search').value = $('vehicle-search').value = ''; $('sector-filter').value = '';
+  $('search').value = ''; $('sector-filter').value = '';
   $('show-sectors').checked = $('show-vehicles').checked = true;
   patioMap.toggleSectors(true); patioMap.toggleVehicles(true);
   selectVehicle(null); update(); patioMap.fit();
@@ -133,7 +123,6 @@ async function start() {
     patioMap?.destroy();
     imageFailed = false;
     patioMap = createPatioMap(data, id => selectVehicle(id), () => {imageFailed = true; update();});
-    patioMap.setDispatchIds(state.dispatchIds);
     update();
     $('load-state').hidden = true;
   } catch (error) {

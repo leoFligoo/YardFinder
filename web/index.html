@@ -40,20 +40,12 @@
           <article class="stat"><div class="stat-icon red" data-icon="alert"></div><div><strong id="missing-count">—</strong><span>Sin ubicación</span></div></article>
           <article class="stat"><div class="stat-icon" data-icon="layers"></div><div><strong id="sector-count">—</strong><span>Sectores del ejemplo</span></div></article>
         </section>
-        <section class="panel vehicle-list-panel" aria-labelledby="vehicle-list-title">
-          <div class="map-heading"><div><h2 id="vehicle-list-title">1. Seleccioná los autos encontrados</h2><span class="muted" id="vehicle-list-count"></span></div><span class="live-label">Hasta 8 por camión</span></div>
-          <div class="list-toolbar"><label class="search"><span data-icon="search"></span><input id="vehicle-search" type="search" placeholder="Buscar modelo, color, VIN, tag o patente…" aria-label="Filtrar autos encontrados" autocomplete="off"></label><button id="clear-dispatch-selection" class="button outline" disabled>Limpiar selección</button></div>
-          <div class="vehicle-table-scroll" tabindex="0" role="region" aria-label="Lista de autos encontrados, desplazable">
-            <table class="vehicle-table"><thead><tr><th scope="col">Elegir</th><th scope="col">Auto</th><th scope="col">Coordenadas</th><th scope="col">Modelo</th><th scope="col">Color</th><th scope="col">VIN</th><th scope="col">AprilTag</th><th scope="col">Patente</th></tr></thead><tbody id="vehicle-list-body"></tbody></table>
-          </div>
-          <div class="dispatch-selection"><p id="dispatch-selection-status" role="status"></p><div id="dispatch-selected" aria-label="Autos elegidos para despacho"></div><p class="small-note">La selección se conserva al buscar o filtrar. Los campos no identificados quedan indicados; la posición X/Y requiere vincular cada detección con un lugar del patio. Selección temporal de esta sesión.</p></div>
-        </section>
         <div class="patio-layout">
           <section class="panel map-panel" aria-label="Vista cenital del patio">
             <div class="map-heading"><div><h2>Mapa del patio</h2><span class="muted">Imagen cenital · Ejemplo precalculado</span></div><span class="live-label"><i></i> Local</span></div>
             <div class="map-toolbar"><label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Buscar VIN, tag o ID…" aria-label="Buscar VIN, tag o ID" autocomplete="off"><kbd>/</kbd></label><label class="sr-only" for="sector-filter">Filtrar por sector</label><select id="sector-filter"><option value="">Todos los sectores</option></select><button id="reset" class="icon-button" title="Restablecer vista y filtros" aria-label="Restablecer vista y filtros"><span data-icon="reset"></span></button></div>
             <div class="map-wrap"><div id="map" aria-label="Mapa interactivo de vehículos" tabindex="0"></div><div class="north" aria-hidden="true">N<span>↑</span></div><div id="map-message" class="map-message" role="status" hidden></div><div class="layer-controls"><label><input id="show-sectors" type="checkbox" checked> Sectores</label><label><input id="show-vehicles" type="checkbox" checked> Autos</label></div></div>
-            <div class="map-footer"><span id="result-count" role="status"></span><div class="legend"><span><i class="green-bg"></i> En sector</span><span><i class="yellow-bg"></i> Fuera de sector</span><span><i class="selected-dot"></i> En consulta</span><span><i class="dispatch-dot"></i> Para despacho</span></div></div>
+            <div class="map-footer"><span id="result-count" role="status"></span><div class="legend"><span><i class="green-bg"></i> En sector</span><span><i class="yellow-bg"></i> Fuera de sector</span><span><i class="selected-dot"></i> En consulta</span></div></div>
             <div id="search-results" class="search-results" aria-label="Resultados de búsqueda" hidden></div>
           </section>
           <aside class="context-column" aria-label="Información del patio">

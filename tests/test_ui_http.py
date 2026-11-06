@@ -31,6 +31,9 @@ class UIHTTPTests(unittest.TestCase):
         paths = ['/ui', '/ui/', '/ui/app.js', '/ui/styles.css', '/ui/map.js',
                  '/ui/icons.js', '/ui/state.js', '/ui/data.js', '/ui/yard-layout.js', '/ui/vehicle-list.js', '/ui/favicon.svg',
                  '/vendor/leaflet/leaflet.js', '/vendor/leaflet/leaflet.css']
+        page = self.get('/ui/')[2].decode()
+        self.assertNotIn('vehicle-list-panel', page)
+        self.assertNotIn('vehicle-list-body', page)
         status, _, body = self.get('/ui/data/patio.json')
         self.assertEqual(status, 200)
         data = json.loads(body)
