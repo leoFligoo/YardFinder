@@ -4,3 +4,4 @@
 opencv-python-headless>=4.8
 numpy
 pillow>=10
+boto3

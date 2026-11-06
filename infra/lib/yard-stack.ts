@@ -46,6 +46,11 @@ export class YardStack extends cdk.Stack {
       generateSecretString: { passwordLength: 40, excludePunctuation: true },
     });
 
+    // Anthropic API key for "Planificar por chat" (/api/despacho). Created out of
+    // band (not by this stack); imported by name so IAM/env stay account-agnostic.
+    const anthropicSecret = secretsmanager.Secret.fromSecretNameV2(
+      this, 'AnthropicApiKey', 'yard-finder/anthropic-api-key');
+
     // ── Network: default VPC, public subnet, no SSH ──────────────────────────
     const vpc = ec2.Vpc.fromLookup(this, 'Vpc', { isDefault: true });
 
@@ -68,11 +73,13 @@ export class YardStack extends cdk.Stack {
     bucket.grantRead(role, 'releases/*');   // pull releases
     bucket.grantPut(role, 'db-backups/*');  // push DB backups (no read/delete)
     originSecret.grantRead(role);           // nginx secret, fetched at deploy time
+    anthropicSecret.grantRead(role);        // Anthropic API key, read at runtime by despacho.py
 
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
       `export YARD_BUCKET=${bucket.bucketName}`,
       `export YARD_ORIGIN_SECRET_ID=${originSecret.secretArn}`,
+      `export ANTHROPIC_SECRET_ID=${anthropicSecret.secretName}`,
       fs.readFileSync(path.join(__dirname, '..', 'server', 'bootstrap.sh'), 'utf8'),
     );
 
