@@ -16,6 +16,7 @@ import datetime as dt
 import errno
 import json
 import mimetypes
+import re
 import subprocess
 import sys
 import threading
@@ -25,6 +26,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 import procesar_vuelo as pv
+from inventario_ui import InventarioError, leer_patio, resolver_recorte
 
 PUERTO = 8765
 BASE = pv.BASE
@@ -208,6 +210,7 @@ class Manejador(BaseHTTPRequestHandler):
         self.send_response(codigo)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(cuerpo)))
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(cuerpo)
 
@@ -230,6 +233,15 @@ class Manejador(BaseHTTPRequestHandler):
 
     def do_GET(self):
         ruta = unquote(urlparse(self.path).path)
+        if ruta == '/api/patio' or ruta.startswith('/api/patio/recortes/'):
+            try:
+                if ruta == '/api/patio':
+                    return self._json(leer_patio(BASE))
+                match = re.fullmatch(r'/api/patio/recortes/(\d+)/(\d+)', ruta)
+                destino = resolver_recorte(BASE, *map(int, match.groups())) if match else None
+                return self._archivo(destino) if destino else self.send_error(404)
+            except InventarioError as error:
+                return self._json({'error': str(error)}, 503)
         if ruta == "/":
             return self._archivo(BASE / "interfaz.html")
         if ruta in {"/ui", "/ui/"}:

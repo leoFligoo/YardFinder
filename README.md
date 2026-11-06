@@ -28,7 +28,7 @@ izquierda, una central entre las columnas 2 y 3, y una derecha. Tres calles tran
 conectan los lotes y los accesos señalizados de **Entrada** y **Salida**.
 Cada lote está delimitado por un único contorno verde sin relleno, que incluye la calle central.
 
-- Cada lote muestra «20 disponibles». Los contadores se calculan de esta distribución de ejemplo.
+- Cada lote muestra la cantidad de autos ubicados según SQLite. No se infiere disponibilidad para despacho. Las posiciones sin observación quedan vacías.
 - Click, Enter o Espacio sobre un auto abre su ficha lateral: recorte, coordenadas, sector, Tag, VIN, patente, modelo, color y confianza. La consulta no lo reserva para despacho. En móvil la ficha aparece debajo del plano; cerrar restaura la vista completa.
 - Zoom con +/−, desplazamiento por arrastre al acercar y «Ver todo» para restaurar el plano.
 - `x` es la columna (1–4), `y` la fila (1–5), con origen arriba a la izquierda de cada lote.
@@ -42,14 +42,25 @@ recorrido no cruce autos estacionados. Los ejes y costos usan unidades del dibuj
 ni coordenadas GPS**. La red es conceptual y bidireccional; no modela todavía radios de giro,
 sentidos únicos ni restricciones físicas de un camión.
 
-La disponibilidad es simulada: todas las posiciones del ejemplo están disponibles.
-El plano no consulta `inventario.db`. Al abrir la ficha se lee `web/data/patio.json` y se asocian
-las posiciones a los IDs 1–120 del ejemplo, en orden por lote, fila y columna. Esta asociación
-es **simulada**, no una vinculación inferida por GPS: la ficha lo indica y distingue el lote del
-plano del sector original de la observación. Se muestran los recortes y atributos originales;
-los datos ausentes no se inventan. Cerrar o cambiar rápidamente de posición ignora respuestas
-pendientes de la ficha anterior. La integración con el inventario real y el recorrido quedan pendientes. Los archivos originales,
-ortofotos y el mapa de resultados siguen disponibles en el flujo anterior del servidor (`/`).
+El plano consulta **`GET /api/patio`**, que abre `inventario.db` en modo de solo lectura.
+Se usa el último vuelo por `fecha DESC, id DESC`, sin mezclar observaciones históricas.
+Cada auto se ubica por **`lote + pos_x + pos_y`** y sus datos se unen con `vehiculos` por `tag`.
+Los IDs no determinan las posiciones: por ejemplo, Auto #062 está en lote 1, `(4,5)`.
+`Actualizar patio` vuelve a leer SQLite y cierra cualquier ficha anterior; no hay actualización automática.
+
+Las posiciones inválidas o duplicadas producen un error visible con reintento; no se sustituyen
+por datos de ejemplo. Un vuelo vacío muestra el plano sin autos. Los campos ausentes permanecen
+sin identificar y no se escribe ni modifica la base. El inventario incluido contiene datos de prueba.
+`web/data/patio.json` se conserva como referencia histórica, pero esta pantalla ya no lo consume.
+
+**`GET /api/patio/recortes/<vuelo_id>/<auto_id>`** busca la observación y resuelve su recorte dentro
+de `salida/<nombre_del_vuelo>/recortes/`. Así se aprovechan las imágenes locales aunque SQLite
+contenga rutas absolutas de otra computadora. No se exponen esas rutas ni se sirve el archivo `.db`.
+Los archivos originales, ortofotos y mapa de resultados siguen disponibles en el flujo anterior (`/`).
+
+Para compartir la UI por un túnel, ejecutar `.venv/bin/python compartir_ui.py` y apuntar el túnel a
+`127.0.0.1:8766`. Esa vista solo sirve la UI, la consulta de inventario y sus recortes; bloquea
+las APIs de configuración/procesamiento y las solicitudes POST.
 
 Solo Patio está implementado en esta entrega. Los accesos restantes explican que están pendientes;
 el chat, la selección de hasta 8 autos y el recorrido se incorporan en sus siguientes PRs.
@@ -92,7 +103,7 @@ seleccionados superpuestos. También están disponibles como [ZIP](output/imageg
 | `web/yard-layout.js` | Generador y plano SVG interactivo de 6 lotes × 20 posiciones |
 | `web/yard-geometry.js` | Calles, entrada/salida y red de circulación compartida con futuras rutas |
 | `web/vehicle-list.js` | Componente reservado para coincidencias del chat; no montado en Patio |
-| `web/vehicle-detail.js` | Ficha, carga de observaciones y asociación explícita para la demo |
+| `web/vehicle-detail.js` | Ficha del auto vinculado a la posición en SQLite |
 | `web/data/patio.json` | Snapshot histórico de observaciones usado por las fichas |
 | `plantilla_mapa.html` | Mapa y buscador de vehículos |
 | `interfaz.py` | Servidor local y API |

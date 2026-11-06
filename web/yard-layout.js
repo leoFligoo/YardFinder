@@ -1,3 +1,4 @@
+import {normalizeInventory} from './data.js';
 import {buildYardGeometry} from './yard-geometry.js';
 
 // Logical positions are local to each lot, never latitude/longitude or image pixels.
@@ -27,6 +28,18 @@ export function findPosition(yard, lotId, x, y) {
   return yard.lots.find(lot => lot.id === lotId)?.positions.find(p => p.x === x && p.y === y) ?? null;
 }
 
+export function assignInventory(yard, autos) {
+  normalizeInventory({fuente: 'sqlite', autos});
+  for (const lot of yard.lots) for (const p of lot.positions) p.auto = null;
+  for (const auto of autos) {
+    const p = auto.posicion;
+    const position = findPosition(yard, p.loteId, p.x, p.y);
+    if (!position) throw new Error('Posición fuera del plano.');
+    position.auto = auto;
+  }
+  return yard;
+}
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 function svgNode(name, attributes = {}, text) {
   const node = document.createElementNS(SVG_NS, name);
@@ -35,8 +48,8 @@ function svgNode(name, attributes = {}, text) {
   return node;
 }
 
-export function renderYardLayout(container, {onSelect = () => {}, onClear = () => {}} = {}) {
-  const yard = generateYard();
+export function renderYardLayout(container, {autos = [], onSelect = () => {}, onClear = () => {}} = {}) {
+  const yard = assignInventory(generateYard(), autos);
   const geometry = buildYardGeometry(yard);
   container.innerHTML = `
     <section class="panel yard-board" aria-labelledby="yard-title">
@@ -51,7 +64,7 @@ export function renderYardLayout(container, {onSelect = () => {}, onClear = () =
       </div>
       <div class="yard-viewport" aria-label="Plano interactivo del patio"></div>
       <div class="yard-board-footer">
-        <div class="yard-legend"><span><i class="green-bg"></i>Disponible</span><span><i class="yellow-bg"></i>En consulta</span><span><i class="road-key"></i>Calle de circulación</span></div>
+        <div class="yard-legend"><span><i class="green-bg"></i>Auto ubicado</span><span><i class="yellow-bg"></i>En consulta</span><span><i class="road-key"></i>Calle de circulación</span></div>
         <span>Usá + / − para acercarte · Arrastrá para mover</span>
       </div>
       <div class="yard-inspection" role="status" aria-live="polite"><span class="inspection-icon">↖</span><div><strong id="yard-position-title">Consultá una posición</strong><p id="yard-position-description">Seleccioná un auto del plano para ver su lote y coordenadas.</p></div><button id="yard-clear" type="button" aria-label="Cerrar consulta de posición" hidden>×</button></div>
@@ -90,19 +103,20 @@ export function renderYardLayout(container, {onSelect = () => {}, onClear = () =
     const layer = svgNode('g', {'data-lot-id': lot.id, class: 'yard-lot'});
     layer.append(svgNode('rect', {x: lot.left + 26, y: lot.top + 124, width: 298, height: 269, rx: 9, class: 'yard-lot-outline'}));
     layer.append(svgNode('text', {x: lot.left + 34, y: lot.top + 147, class: 'yard-lot-title'}, `LOTE ${String(lot.id).padStart(2, '0')}`));
-    layer.append(svgNode('text', {x: lot.left + 204, y: lot.top + 147, class: 'yard-lot-count'}, `${lot.positions.filter(p => p.available).length} disponibles`));
+    layer.append(svgNode('text', {x: lot.left + 204, y: lot.top + 147, class: 'yard-lot-count'}, `${lot.positions.filter(p => p.auto).length} ubicados`));
     for (const position of lot.positions) {
-      const group = svgNode('g', {class: 'yard-car', transform: `translate(${position.cx - 27} ${position.cy - 13})`,
-        role: 'button', tabindex: '0', 'aria-pressed': 'false', 'data-position-id': position.id,
-        'aria-label': `Lote ${lot.id}, columna ${position.x}, fila ${position.y}, disponible`});
+      const group = svgNode('g', {class: position.auto ? 'yard-car' : 'yard-empty', transform: `translate(${position.cx - 27} ${position.cy - 13})`,
+        role: position.auto ? 'button' : 'img', tabindex: position.auto ? '0' : '-1', 'aria-pressed': 'false', 'data-position-id': position.id,
+        'aria-label': `Lote ${lot.id}, columna ${position.x}, fila ${position.y}, ${position.auto ? `auto #${position.auto.id}` : 'sin auto registrado'}`});
       group.append(svgNode('rect', {x: -4, y: -5, width: 62, height: 40, rx: 4, class: 'yard-bay'}));
-      group.append(svgNode('use', {href: '#yard-car-shape'}));
+      if (position.auto) group.append(svgNode('use', {href: '#yard-car-shape'}));
       group.append(svgNode('text', {x: 27, y: 36, 'text-anchor': 'middle', class: 'yard-coordinate'}, `${position.x},${position.y}`));
       const select = () => {
+        if (!position.auto) return;
         svg.querySelectorAll('.yard-car[aria-pressed="true"]').forEach(el => el.setAttribute('aria-pressed', 'false'));
         group.setAttribute('aria-pressed', 'true');
         container.querySelector('#yard-position-title').textContent = `Lote ${lot.id} · (${position.x}, ${position.y})`;
-        container.querySelector('#yard-position-description').textContent = `Disponible · Columna ${position.x}, fila ${position.y} · ${position.id}`;
+        container.querySelector('#yard-position-description').textContent = `Auto #${position.auto.id} · Columna ${position.x}, fila ${position.y} · ${position.id}`;
         container.querySelector('#yard-clear').hidden = false;
         onSelect(position);
       };

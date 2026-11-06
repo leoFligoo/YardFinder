@@ -1,5 +1,5 @@
-// The rest of the UI only consumes this normalized snapshot. A live adapter can
-// replace loadPatio later without coupling screen components to API response shapes.
+// The patio loads SQLite through the local API. Legacy export helpers remain
+// available for the original photographic example, never as a fallback.
 export const TRUCK_CAPACITY = 8;
 export function hasLocation(auto) {
   return Number.isFinite(auto.lat) && Number.isFinite(auto.lon)
@@ -49,8 +49,34 @@ export function assetUrl(path) {
   }
   return `/demo-assets/${path}`;
 }
+export function normalizeInventory(raw) {
+  if (!raw || raw.fuente !== 'sqlite' || !Array.isArray(raw.autos)) {
+    throw new Error('La respuesta del inventario no tiene el formato esperado.');
+  }
+  const ids = new Set(), positions = new Set();
+  for (const auto of raw.autos) {
+    const p = auto.posicion;
+    if (!Number.isInteger(auto.id) || ids.has(auto.id)) throw new Error('Identificador de auto inválido o duplicado.');
+    if (!p || ![p.loteId, p.x, p.y].every(Number.isInteger)
+        || p.loteId < 1 || p.loteId > 6 || p.x < 1 || p.x > 4 || p.y < 1 || p.y > 5) {
+      throw new Error('El auto no tiene una posición válida de lote/X/Y.');
+    }
+    const key = `${p.loteId}:${p.x}:${p.y}`;
+    if (positions.has(key)) throw new Error('Dos autos ocupan la misma posición.');
+    ids.add(auto.id); positions.add(key);
+  }
+  return raw;
+}
+export function inventoryImageUrl(auto) {
+  const expected = `/api/patio/recortes/${auto.vuelo_id}/${auto.id}`;
+  if (!Number.isInteger(auto.vuelo_id) || !Number.isInteger(auto.id) || auto.recorte !== expected) {
+    throw new Error('Referencia de recorte inválida.');
+  }
+  return expected;
+}
 export async function loadPatio() {
-  const response = await fetch('/ui/data/patio.json', {cache: 'no-store'});
-  if (!response.ok) throw new Error(`No se pudo leer el ejemplo local (HTTP ${response.status}).`);
-  return normalizePatio(await response.json());
+  const response = await fetch('/api/patio', {cache: 'no-store'});
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || `No se pudo leer el inventario (HTTP ${response.status}).`);
+  return normalizeInventory(data);
 }

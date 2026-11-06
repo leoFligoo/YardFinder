@@ -27,9 +27,9 @@
   </aside>
   <div class="workspace">
     <main id="contenido" tabindex="-1">
-      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="heading-action"><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button></div></section>
+      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="heading-action"><button id="refresh-patio" class="button outline" type="button">Actualizar patio</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button></div></section>
       <section class="stats" aria-label="Resumen de la distribución">
-        <article class="stat"><div class="stat-icon green" data-icon="car"></div><div><strong id="available-count">—</strong><span>Disponibles</span></div></article>
+        <article class="stat"><div class="stat-icon green" data-icon="car"></div><div><strong id="available-count">—</strong><span>Autos ubicados</span></div></article>
         <article class="stat"><div class="stat-icon" data-icon="layers"></div><div><strong id="lot-count">—</strong><span>Lotes</span></div></article>
         <article class="stat"><div class="stat-icon" data-icon="car"></div><div><strong id="per-lot-count">—</strong><span>Posiciones por lote</span></div></article>
         <article class="stat"><div class="stat-icon" data-icon="arrow"></div><div><strong id="access-count">—</strong><span>Entrada y salida</span></div></article>
@@ -41,10 +41,9 @@
           <div class="vehicle-photo-frame"><img id="vehicle-photo" alt="Recorte del auto" hidden><p id="vehicle-image-status" role="status"></p></div>
           <dl id="vehicle-info"></dl>
           <p id="vehicle-detail-message" class="small-note"></p>
-          <button id="vehicle-detail-retry" class="button outline" hidden>Reintentar</button>
         </aside>
       </div>
-      <footer class="page-footer"><span data-icon="info"></span><span>Distribución de ejemplo · Consultar una posición no la reserva para despacho.</span><span class="version">UI 01 / PATIO</span></footer>
+      <footer class="page-footer"><span data-icon="info"></span><span>Consultar un auto no lo reserva para despacho.</span><span class="version">UI 01 / PATIO</span></footer>
     </main>
   </div>
   <dialog id="pending-dialog" aria-labelledby="pending-title"><span class="dialog-icon" data-icon="layers"></span><h2 id="pending-title">Próxima pantalla</h2><p id="pending-description"></p><button id="close-dialog" class="button primary">Volver al patio</button></dialog>

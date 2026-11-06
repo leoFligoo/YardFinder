@@ -1920,3 +1920,7 @@ dialog p {
     min-height: 220px;
   }
 }
+
+.yard-empty .yard-bay { fill: none; stroke: #53616e; stroke-dasharray: 3 3; }
+.yard-empty .yard-coordinate { fill: #8995a2; }
+.heading-action { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }

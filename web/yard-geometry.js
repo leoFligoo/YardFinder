@@ -40,7 +40,7 @@ export function buildYardGeometry(yard) {
       const cy = top + 190 + (position.y - 1) * 42;
       const streetX = left + [0, 170, 170, 340][position.x - 1];
       return {...position, cx, cy, width: 54, height: 26,
-        accessNodeId: nodeId(streetX, cy), available: true};
+        accessNodeId: nodeId(streetX, cy)};
     })};
   });
   return {width, height, lots, positions: lots.flatMap(l => l.positions), roads, nodes, edges,

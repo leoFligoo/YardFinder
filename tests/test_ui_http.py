@@ -37,11 +37,11 @@ class UIHTTPTests(unittest.TestCase):
         self.assertNotIn('id="map"', page)
         self.assertNotIn('type="search"', page)
         self.assertNotIn('Mapa del patio', page)
-        status, _, body = self.get('/ui/data/patio.json')
+        status, _, body = self.get('/api/patio')
         self.assertEqual(status, 200)
         data = json.loads(body)
-        paths.extend('/demo-assets/' + h['orto']['archivo'] for h in data['huellas'])
-        paths.extend('/demo-assets/' + a['recorte'] for a in data['autos'])
+        self.assertEqual(data['fuente'], 'sqlite')
+        paths.extend(a['recorte'] for a in data['autos'])
         for path in paths:
             with self.subTest(path=path):
                 self.assertEqual(self.get(path)[0], 200)
