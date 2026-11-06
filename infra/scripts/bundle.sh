@@ -17,9 +17,9 @@ cp -R web "$S/web" && rm -rf "$S/web/data"           # data/patio.json is no lon
 mkdir -p "$S/vendor" && cp -R vendor/leaflet "$S/vendor/leaflet"
 
 # PWA: static files only (no certs, local dev servers, screenshots, docs)
-mkdir "$S/PWA"
+mkdir "$S/pwa"   # lowercase: nginx serves /pwa/ from this dir (Linux is case-sensitive)
 (cd PWA && tar --exclude='*.pem' --exclude='*.png' --exclude='serve_*.py' \
-    --exclude='*.md' --exclude='_openssl_min.cnf' -cf - .) | tar -xf - -C "$S/PWA"
+    --exclude='*.md' --exclude='_openssl_min.cnf' -cf - .) | tar -xf - -C "$S/pwa"
 
 # Server-side files shipped with every release
 cp infra/requirements.server.txt "$S/"
@@ -34,7 +34,7 @@ for d in salida/vuelo_*/recortes; do
   mkdir -p "$S/seed/$(dirname "$d")" && cp -R "$d" "$S/seed/$d"
 done
 
-for f in compartir_ui.py web/index.html PWA/index.html PWA/sw.js seed/inventario.db remote/apply.sh; do
+for f in compartir_ui.py web/index.html pwa/index.html pwa/sw.js seed/inventario.db remote/apply.sh; do
   [ -e "$S/$f" ] || { echo "bundle is missing $f" >&2; exit 1; }
 done
 

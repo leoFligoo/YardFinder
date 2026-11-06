@@ -11,6 +11,7 @@ DATA=/var/lib/yard
 [ -f "$DATA/.bootstrapped" ] || { echo "bootstrap has not finished (see /var/log/yard-bootstrap.log)"; exit 1; }
 
 mv "$STAGE" "$REL"
+chown -R root:root "$REL"   # tarball keeps the uploader's uid
 chmod -R go+rX "$REL"
 
 # ── Data: seed once, never clobber what the PWA has written ─────────────────
@@ -55,7 +56,8 @@ systemctl enable yard yard-backup.timer >/dev/null 2>&1
 systemctl start yard-backup.timer
 
 # ── Switch release, restart, verify, roll back on failure ───────────────────
-PREV=$(readlink -f /opt/yard/current 2>/dev/null || true)
+PREV=""
+[ -L /opt/yard/current ] && PREV=$(readlink -f /opt/yard/current 2>/dev/null || true)
 ln -sfn "$REL" /opt/yard/current
 systemctl restart yard
 systemctl enable --now nginx >/dev/null 2>&1
@@ -77,7 +79,7 @@ if healthy; then
 else
   echo "HEALTH CHECK FAILED for $TS" >&2
   journalctl -u yard -n 30 --no-pager >&2 || true
-  if [ -n "$PREV" ] && [ -d "$PREV" ]; then
+  if [ -n "$PREV" ] && [ -d "$PREV" ] && [ "$PREV" != "$REL" ]; then
     ln -sfn "$PREV" /opt/yard/current
     systemctl restart yard
     echo "rolled back to $PREV" >&2
