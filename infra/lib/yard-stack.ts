@@ -46,6 +46,16 @@ export class YardStack extends cdk.Stack {
       generateSecretString: { passwordLength: 40, excludePunctuation: true },
     });
 
+    // ── Anthropic API key: CDK only creates the (empty-ish) secret ───────────
+    // The initial value is a throwaway random string; put the real key with
+    //   aws secretsmanager put-secret-value --secret-id yard-finder/anthropic-api-key --secret-string sk-ant-...
+    // Later deploys never overwrite it. Retained so the key survives a stack delete.
+    const anthropicKey = new secretsmanager.Secret(this, 'AnthropicApiKey', {
+      secretName: 'yard-finder/anthropic-api-key',
+      description: 'Anthropic API key used by the app (value is set manually, not by CDK)',
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+
     // ── Network: default VPC, public subnet, no SSH ──────────────────────────
     const vpc = ec2.Vpc.fromLookup(this, 'Vpc', { isDefault: true });
 
@@ -68,6 +78,7 @@ export class YardStack extends cdk.Stack {
     bucket.grantRead(role, 'releases/*');   // pull releases
     bucket.grantPut(role, 'db-backups/*');  // push DB backups (no read/delete)
     originSecret.grantRead(role);           // nginx secret, fetched at deploy time
+    anthropicKey.grantRead(role);           // Anthropic API key, read by the app
 
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
@@ -136,5 +147,6 @@ export class YardStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'Url', { value: `https://${distribution.distributionDomainName}` });
     new cdk.CfnOutput(this, 'InstanceId', { value: instance.instanceId });
     new cdk.CfnOutput(this, 'BucketName', { value: bucket.bucketName });
+    new cdk.CfnOutput(this, 'AnthropicSecretName', { value: anthropicKey.secretName });
   }
 }
