@@ -29,8 +29,9 @@ export function createPatioMap(data, onSelect, onImageError) {
   fit();
   const markers = new Map();
   let selectedId = null;
+  let dispatchIds = new Set();
   const icon = (auto, selected) => L.divIcon({
-    className: `auto-marker ${auto.lote ? 'in-sector' : 'outside'}${selected ? ' selected' : ''}`,
+    className: `auto-marker ${auto.lote ? 'in-sector' : 'outside'}${dispatchIds.has(auto.id) ? ' for-dispatch' : ''}${selected ? ' selected' : ''}`,
     html: '<span></span>', iconSize: [14, 14], iconAnchor: [7, 7],
   });
   function select(id, focus = false) {
@@ -63,6 +64,7 @@ export function createPatioMap(data, onSelect, onImageError) {
   observer.observe(document.getElementById('map'));
   return {
     show, select, fit,
+    setDispatchIds: ids => {dispatchIds = new Set(ids); select(selectedId);},
     toggleSectors: visible => visible ? sectors.addTo(map) : sectors.removeFrom(map),
     toggleVehicles: visible => visible ? vehicles.addTo(map) : vehicles.removeFrom(map),
     destroy: () => {observer.disconnect(); map.remove();},

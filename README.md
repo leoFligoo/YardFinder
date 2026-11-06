@@ -22,9 +22,24 @@ La instalación necesita Internet; la aplicación sirve sus mapas, imágenes y b
 Con el mismo servidor activo, abrir **http://127.0.0.1:8765/ui/#/patio**.
 No requiere instalar paquetes ni compilar el frontend.
 
+**Distribución del patio:** 6 lotes de 20 autos, cada uno con **4 columnas × 5 filas**.
+La sección desplegable «Distribución del patio» permite consultar sus 120 posiciones.
+`x` es la columna (1–4) e `y` la fila (1–5), con origen en la esquina superior izquierda
+de cada lote. La dirección completa incluye el lote: `Lote 3 · (2,4)`, ID `L3-X2-Y4`.
+El generador está en `web/yard-layout.js`. No asigna autos ni inventa coordenadas geográficas:
+la vinculación de estas posiciones con detecciones o píxeles de una imagen está pendiente.
+Los 5 sectores y 123 detecciones del ejemplo fotográfico inferior siguen siendo datos de referencia,
+distintos de los 6 lotes y 120 lugares configurados.
+
 - Vista cenital con las dos ortofotos locales, sectores, zoom y selección de autos.
 - Búsqueda por VIN, tag o ID (`#042`), filtro por sector, capas y restablecimiento de vista.
 - Recorte y datos de la observación seleccionada, accesibles también desde los resultados de búsqueda.
+- Lista de autos encontrados antes del mapa: coordenadas, modelo, color, VIN, AprilTag y patente.
+  Selección múltiple para despacho (máximo 8), conservada al filtrar, con chips para quitar autos
+  y resaltado azul en el mapa. Se mantiene en memoria durante la sesión, no después de recargar.
+  No genera todavía recorridos ni reserva vehículos en el inventario.
+  `posicion: {loteId, x, y}` representa una ubicación interna vinculada; el ejemplo actual no tiene
+  esa vinculación ni patente, y muestra «sin vincular»/«sin identificar» junto al GPS disponible.
 - Contadores calculados: 123 detecciones con coordenadas, 0 sin ubicación, 25 fuera de sector,
   5 sectores y 12 tags. **Estar fuera de un sector no significa carecer de ubicación.**
 - Diseño adaptable a escritorio y móvil; estados de carga, error con reintento y búsqueda vacía.
@@ -41,7 +56,7 @@ el chat, la carga de hasta 8 autos y el recorrido se incorporan en sus siguiente
 Validación (sin dependencias adicionales; Node solo se usa para las pruebas de JavaScript):
 
 ```bash
-node --test tests/patio.test.mjs
+node --test tests/*.test.mjs
 .venv/bin/python -m unittest discover -s tests -p 'test_*.py'
 ```
 
@@ -66,6 +81,8 @@ seleccionados superpuestos. También están disponibles como [ZIP](output/imageg
 | `web/index.html`, `web/styles.css`, `web/icons.js` | Nueva UI y estructura visual compartida en `/ui/` |
 | `web/app.js`, `web/map.js` | Pantalla Patio e interacción del mapa Leaflet |
 | `web/data.js`, `web/state.js` | Adaptador de datos y estado compartido para las siguientes pantallas |
+| `web/yard-layout.js` | Generador de 6 lotes × 20 posiciones con coordenadas locales X/Y |
+| `web/vehicle-list.js` | Lista de observaciones y selección de hasta 8 autos para despacho |
 | `web/data/patio.json` | Snapshot del ejemplo local con procedencia explícita |
 | `plantilla_mapa.html` | Mapa y buscador de vehículos |
 | `interfaz.py` | Servidor local y API |

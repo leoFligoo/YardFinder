@@ -19,7 +19,7 @@ export function filterVehicles(autos, {query = '', sector = ''} = {}) {
   const q = query.trim().toLocaleLowerCase('es');
   return autos.filter(a => {
     const sectorMatch = !sector || (sector === '__outside' ? hasLocation(a) && !a.lote : a.lote === sector);
-    const searchMatch = !q || [a.vin, a.tag, a.id, `#${String(a.id).padStart(3, '0')}`]
+    const searchMatch = !q || [a.vin, a.tag, a.patente, a.modelo, a.color, a.id, `#${String(a.id).padStart(3, '0')}`]
       .some(value => value != null && String(value).toLocaleLowerCase('es').includes(q));
     return sectorMatch && searchMatch;
   });

@@ -29,7 +29,7 @@ class UIHTTPTests(unittest.TestCase):
 
     def test_ui_and_every_referenced_asset_are_local_and_available(self):
         paths = ['/ui', '/ui/', '/ui/app.js', '/ui/styles.css', '/ui/map.js',
-                 '/ui/icons.js', '/ui/state.js', '/ui/data.js', '/ui/favicon.svg',
+                 '/ui/icons.js', '/ui/state.js', '/ui/data.js', '/ui/yard-layout.js', '/ui/vehicle-list.js', '/ui/favicon.svg',
                  '/vendor/leaflet/leaflet.js', '/vendor/leaflet/leaflet.css']
         status, _, body = self.get('/ui/data/patio.json')
         self.assertEqual(status, 200)
