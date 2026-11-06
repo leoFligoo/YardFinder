@@ -26,7 +26,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 import procesar_vuelo as pv
-from inventario_ui import InventarioError, leer_patio, resolver_recorte
+from inventario_ui import InventarioError, leer_patio, leer_inventario, resolver_recorte
 
 PUERTO = 8765
 BASE = pv.BASE
@@ -233,8 +233,10 @@ class Manejador(BaseHTTPRequestHandler):
 
     def do_GET(self):
         ruta = unquote(urlparse(self.path).path)
-        if ruta == '/api/patio' or ruta.startswith('/api/patio/recortes/'):
+        if ruta in {'/api/patio', '/api/inventario'} or ruta.startswith('/api/patio/recortes/'):
             try:
+                if ruta == '/api/inventario':
+                    return self._json(leer_inventario(BASE))
                 if ruta == '/api/patio':
                     return self._json(leer_patio(BASE))
                 match = re.fullmatch(r'/api/patio/recortes/(\d+)/(\d+)', ruta)

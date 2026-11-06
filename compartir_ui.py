@@ -11,7 +11,7 @@ class VistaPublica(Manejador):
             self.send_header('Location', '/ui/')
             self.end_headers()
             return
-        if (path in {'/ui', '/ui/', '/api/patio'} or path.startswith('/ui/')
+        if (path in {'/ui', '/ui/', '/api/patio', '/api/inventario'} or path.startswith('/ui/')
                 or path.startswith('/api/patio/recortes/')):
             return super().do_GET()
         self.send_error(404)

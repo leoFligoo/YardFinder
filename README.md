@@ -62,7 +62,7 @@ Para compartir la UI por un túnel, ejecutar `.venv/bin/python compartir_ui.py` 
 `127.0.0.1:8766`. Esa vista solo sirve la UI, la consulta de inventario y sus recortes; bloquea
 las APIs de configuración/procesamiento y las solicitudes POST.
 
-Solo Patio está implementado en esta entrega. Los accesos restantes explican que están pendientes;
+Patio e Inventario están implementados. Los accesos restantes explican que están pendientes;
 el chat, la selección de hasta 8 autos y el recorrido se incorporan en sus siguientes PRs.
 
 El flujo de Despacho será: **búsqueda escrita en el chat → lista de coincidencias → selección
@@ -81,6 +81,48 @@ node --test tests/*.test.mjs
 
 Ver [LEEME.md](LEEME.md) para configuración, procesamiento de fotos/video y comandos de diagnóstico.
 
+### UI 02 · Inventario
+
+Abrir **http://127.0.0.1:8765/ui/#/inventario**. La barra lateral navega entre Patio e Inventario.
+Consulta **`GET /api/inventario`**, en una transacción SQLite de solo lectura, sin cambiar ni seedear
+`inventario.db`. Usa el último vuelo por `fecha DESC, id DESC` y conserva el catálogo completo.
+
+Los conteos se distinguen explícitamente (valores del inventario de prueba incluido):
+
+| Conteo | Definición | Valor |
+|---|---|---:|
+| Registrados | Filas en `vehiculos` | 124 |
+| Registrados ubicados | Registros con observación por tag en el último vuelo | 109 |
+| Sin observación | Registros sin observación en ese vuelo, aunque pudieran tener una histórica | 15 |
+| Sin identificar | Observaciones del último vuelo sin registro asociado, incluido tag ausente o desconocido | 11 |
+| Observaciones | Detecciones del último vuelo: 109 vinculadas + 11 sin identificar | 120 |
+
+La vista inicial **Registrados** contiene 124 filas, incluyendo las 15 sin ubicación. La vista
+**Observaciones sin identificar** contiene las otras 11 detecciones. No se afirma que haya 135 autos
+identificados ni se agregan los 15 sin observación al plano. La pertenencia al catálogo se determina
+por el vínculo de tag, no por tener un VIN/modelo completo. Un tag repetido dentro del último vuelo
+produce un error explícito para no atribuir dos ubicaciones al mismo registro.
+
+- Búsqueda por VIN, AprilTag, modelo, color o ID de observación; ignora mayúsculas y acentos.
+- Filtros combinables por modelo, color, lote y estado de ubicación; **Limpiar** restaura los filtros
+  y orden dentro de la vista actual. Cambiar de vista limpia filtros para evitar coincidencias ocultas.
+- Orden por vehículo, VIN, AprilTag, lote, estado o última observación; datos ausentes al final.
+  Paginación de 10, 25 o 50 filas. Búsqueda, filtros y orden restablecen la primera página.
+- **Actualizar** vuelve a consultar SQLite conservando los filtros válidos. Los conteos superiores
+  corresponden al inventario completo; la cantidad de resultados y la paginación reflejan los filtros.
+- **Ver en patio** abre `#/patio?vuelo=<id>&auto=<id>` y enfoca su posición real lote/X/Y y ficha.
+  Si cambió el último vuelo, se informa que esa observación ya no está vigente, sin mostrar otra por error.
+- Última observación usa la fecha común del vuelo (incluye soporte para formato EXIF). Sin vínculo
+  actual se muestra **Sin observación**, sin reutilizar fechas antiguas ni fechas de ingreso.
+- Estados de carga, error con reintento, catálogo vacío y búsqueda sin coincidencias. En móvil la
+  tabla se desplaza horizontalmente para conservar VIN completo y todas las columnas.
+- No hay selección ni reserva desde Inventario. El chat continúa pendiente; no se simulan resultados.
+  La ubicación no implica disponibilidad, y no existe patente ni reserva en SQLite.
+
+La vista pública de solo lectura en `8766` permite también el GET exacto `/api/inventario`;
+continúa bloqueando POST, APIs administrativas, rutas del sistema y descarga de la base.
+No requiere APIs externas, CDNs, dependencias nuevas ni compilación. `web/data/patio.json` no se consulta.
+
 ## Estado del proyecto
 
 - Implementado: procesamiento de fotos y video con SRT, detección de vehículos y tags, inventario y mapas.
@@ -98,13 +140,14 @@ seleccionados superpuestos. También están disponibles como [ZIP](output/imageg
 |---|---|
 | `interfaz.html` | UI principal, estilos y JavaScript |
 | `web/index.html`, `web/styles.css`, `web/icons.js` | Nueva UI y estructura visual compartida en `/ui/` |
-| `web/app.js` | Pantalla Patio y navegación |
+| `web/app.js`, `web/router.js` | Navegación Patio/Inventario y consulta de observaciones por ID |
+| `web/inventory.js`, `web/inventory-data.js` | Tabla de Inventario, filtros, conteos, orden y paginación |
 | `web/data.js`, `web/state.js` | Adaptador de datos y estado compartido para las siguientes pantallas |
 | `web/yard-layout.js` | Generador y plano SVG interactivo de 6 lotes × 20 posiciones |
 | `web/yard-geometry.js` | Calles, entrada/salida y red de circulación compartida con futuras rutas |
 | `web/vehicle-list.js` | Componente reservado para coincidencias del chat; no montado en Patio |
 | `web/vehicle-detail.js` | Ficha del auto vinculado a la posición en SQLite |
-| `web/data/patio.json` | Snapshot histórico de observaciones usado por las fichas |
+| `web/data/patio.json` | Snapshot histórico de observaciones, no usado por Patio ni Inventario |
 | `plantilla_mapa.html` | Mapa y buscador de vehículos |
 | `interfaz.py` | Servidor local y API |
 | `vendor/leaflet/` | Biblioteca y recursos del mapa offline |
