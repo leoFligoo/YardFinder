@@ -14,7 +14,18 @@ python3.12 -m venv .venv
 .venv/bin/python interfaz.py
 ```
 
-Abrir **http://127.0.0.1:8765**. En el Mac ya preparado basta con `./iniciar_interfaz.command`.
+El navegador abre **http://127.0.0.1:8765/ui/#/patio**. En el Mac ya preparado basta con `./iniciar_interfaz.command`.
+En Windows, ejecutar `iniciar_interfaz.bat`: usa `.venv\Scripts\python.exe` si existe y,
+en caso contrario, `python` del PATH. Valida las dependencias antes de iniciar y acepta
+`--no-browser` para evitar abrir el navegador. Para preparar el entorno en Windows:
+
+```bat
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+iniciar_interfaz.bat
+```
+
+La interfaz de procesamiento de vuelos sigue disponible en **http://127.0.0.1:8765/**.
 La instalación necesita Internet; la aplicación sirve sus mapas, imágenes y bibliotecas desde el equipo.
 
 ### UI 01 · Vista del patio

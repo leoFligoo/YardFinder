@@ -20,7 +20,7 @@ El entorno de esta computadora está en `.venv`, con Python 3.12. Para abrir la 
 ```
 
 También podés hacer doble clic en `iniciar_interfaz.command`. La dirección es
-`http://127.0.0.1:8765`. Cerrá el proceso con Ctrl+C cuando termines.
+`http://127.0.0.1:8765/ui/#/patio`. Cerrá el proceso con Ctrl+C cuando termines.
 Para iniciarlo sin abrir el navegador: `./iniciar_interfaz.command --no-browser`.
 
 La sección **Resultados** incluye `demo_local`, con 123 detecciones de ejemplo, 12 tags y 2 fotos.
@@ -30,7 +30,8 @@ Esto reemplaza solamente la copia `salida/demo_local`, sin modificar `inventario
 
 Archivos para desarrollar la UI:
 
-- `interfaz.html`: pantalla principal, estilos y JavaScript.
+- `web/`: UI actual del operador (Patio e Inventario).
+- `interfaz.html`: interfaz de procesamiento de vuelos, estilos y JavaScript.
 - `plantilla_mapa.html`: mapa exportado con Leaflet.
 - `interfaz.py`: servidor y endpoints `/api/config`, `/api/videos`, `/api/resultados` y `/api/estado`.
 - `output/imagegen/yard-finder-demo-v3/`: diseños de referencia (chat, máximo 8 autos por camión y ruta sugerida sobre una imagen cenital simulada).
@@ -87,7 +88,12 @@ y la vuelta son automáticos (dejá configurado RTH).
 
 ## 3. Interfaz (la forma más simple)
 
-Doble clic en **`iniciar_interfaz.bat`** (o `python interfaz.py`). Se abre el navegador con tres pasos:
+Doble clic en **`iniciar_interfaz.bat`** (o `python interfaz.py`). Se abre la UI actual del
+operador en **http://127.0.0.1:8765/ui/#/patio**, con acceso a Patio e Inventario.
+El lanzador de Windows prefiere `.venv\Scripts\python.exe`, comprueba las dependencias
+y también acepta `--no-browser`.
+
+Para procesar vuelos, abrir **http://127.0.0.1:8765/**, donde siguen los tres pasos:
 
 1. **Configuración:** carpeta de los videos (puede ser la microSD), archivo de lotes, cámara usada,
    cada cuántos metros sacar un cuadro, altura mínima, confianza de detección y orientación de la cámara.

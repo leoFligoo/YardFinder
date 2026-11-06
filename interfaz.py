@@ -3,7 +3,8 @@ Interfaz web local del inventario con drone.
 
     python interfaz.py            (o doble clic en iniciar_interfaz.bat)
 
-Abre el navegador en http://127.0.0.1:8765 con tres pasos:
+Abre la UI del operador en http://127.0.0.1:8765/ui/#/patio.
+El procesamiento de vuelos sigue disponible en http://127.0.0.1:8765 con tres pasos:
   1. Configuración: carpeta de los videos, archivo de lotes y parámetros de procesamiento.
   2. Videos: lista de los MP4 de la carpeta (con o sin .SRT, ya procesados o no) y botón para procesarlos.
   3. Resultados: cada vuelo procesado, con su mapa.
@@ -301,7 +302,7 @@ class Servidor(ThreadingHTTPServer):
 
 
 def main():
-    url = f"http://127.0.0.1:{PUERTO}"
+    url = f"http://127.0.0.1:{PUERTO}/ui/#/patio"
     try:
         servidor = Servidor(("127.0.0.1", PUERTO), Manejador)
     except OSError as e:
