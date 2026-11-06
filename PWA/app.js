@@ -1,13 +1,14 @@
 // app.js — Yard Finder · PWA del chofer.
-import { PATIO, AUTOS, ORDEN } from './data.js';
+import { PATIO, cargarOrden, retirarEnBackend } from './data.js';
 import { RastreoGPS } from './geo.js';
 import { leerTagDeVideo, precargarDetector, estadoDetector, diagDetector } from './tag-detector.js';
 
 /* ------------------------------------------------------------------ *
- * Estado
+ * Estado (se llena al cargar la orden activa del backend)
  * ------------------------------------------------------------------ */
-const porTag = new Map(AUTOS.map(a => [a.tag, a]));
-restaurarEstado();
+let AUTOS = [];
+let ORDEN = { id: '—', destino: '—', transportista: '—', estado: '', recorrido: [] };
+let porTag = new Map();
 
 const $ = sel => document.querySelector(sel);
 const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
@@ -195,23 +196,28 @@ function avisoTag(titulo, texto) {
 /* ------------------------------------------------------------------ *
  * Marcar retirado   (la escritura a la base queda para después)
  * ------------------------------------------------------------------ */
-function marcarRetirado(a) {
-  a.estado = 'retirado';
-  guardarEstado();
-  sincronizarRetiro(a);      // <-- integración con inventario.db (pendiente)
+// Marca el auto como retirado en inventario.db (vía backend) y refleja el estado.
+async function marcarRetirado(a) {
+  const previo = a.estado;
+  a.estado = 'retirado';               // optimista: la UI responde al instante
   renderTodo();
   toast(`#${a.tag} ${a.modelo} · retirado`, 'ok');
-  if (!proximoAuto()) { irA('recorrido'); toast('Orden completa ✓', 'ok'); }
-}
-
-// PENDIENTE (fase 2): avisar al backend para marcar el auto como 'retirado'
-// en inventario.db. Punto único de integración; hoy solo deja registro local.
-async function sincronizarRetiro(a) {
-  const evento = { orden: ORDEN.id, tag: a.tag, vin: a.vin, estado: 'retirado', ts: new Date().toISOString() };
-  console.info('[retiro→inventario.db] (pendiente de backend)', evento);
-  // Ejemplo de fase 2:
-  // await fetch('/api/inventario/retiro', { method:'POST',
-  //   headers:{'Content-Type':'application/json'}, body: JSON.stringify(evento) });
+  try {
+    const r = await retirarEnBackend(a.tag);
+    if (!r.ok) {
+      a.estado = previo; renderTodo();
+      toast(r.error || 'No se pudo registrar el retiro', 'err');
+      return;
+    }
+    if (r.orden && r.orden.estado === 'completa') {
+      ORDEN.estado = 'completa';
+      irA('recorrido');
+      toast('Orden completa ✓', 'ok');
+    }
+  } catch {
+    a.estado = previo; renderTodo();
+    toast('Sin conexión: el retiro no se registró', 'err');
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -302,7 +308,7 @@ function procesarTag(tag) {
 
 $('#btn-cam').addEventListener('click', iniciarCamara);
 $('#btn-manual').addEventListener('click', () => {
-  const v = prompt('Número de tag del techo (0–29):');
+  const v = prompt('Número de tag del techo:');
   if (v === null) return;
   const n = parseInt(v.trim(), 10);
   if (!Number.isFinite(n)) { toast('Tag inválido', 'err'); return; }
@@ -386,21 +392,29 @@ function toast(msg, tipo = '') {
 }
 
 /* ------------------------------------------------------------------ *
- * Persistencia local del progreso (reabrir sin perder lo retirado)
+ * Carga de la orden activa desde el backend (inventario.db)
  * ------------------------------------------------------------------ */
-function guardarEstado() {
+async function cargarYRender() {
   try {
-    const estados = Object.fromEntries(AUTOS.map(a => [a.tag, a.estado]));
-    localStorage.setItem('yf_estados_' + ORDEN.id, JSON.stringify(estados));
-  } catch { /* modo privado / sin storage */ }
+    const data = await cargarOrden();
+    if (!data) { mostrarSinOrden(); return; }
+    AUTOS = data.autos;
+    ORDEN = data.orden;
+    porTag = new Map(AUTOS.map(a => [a.tag, a]));
+    renderTodo();
+  } catch (e) {
+    mostrarSinOrden(e.message);
+  }
 }
-function restaurarEstado() {
-  try {
-    const raw = localStorage.getItem('yf_estados_' + ORDEN.id);
-    if (!raw) return;
-    const estados = JSON.parse(raw);
-    for (const a of AUTOS) if (estados[a.tag]) a.estado = estados[a.tag];
-  } catch { /* ignorar */ }
+
+function mostrarSinOrden(msg) {
+  AUTOS = []; porTag = new Map();
+  $('#orden-id').textContent = 'Sin orden activa';
+  $('#orden-dest').textContent = msg || 'El operador debe generar una orden de retiro desde el panel.';
+  $('#orden-prog-n').textContent = '0/0';
+  $('#yard').innerHTML = '';
+  $('#lista-pend').innerHTML = '';
+  $('#proximo').innerHTML = '<div class="prox-card" style="border-color:var(--borde)"><div class="info"><div class="m">No hay orden activa</div><div class="d">Pedile al operador que genere el despacho (Planificar por chat).</div></div></div>';
 }
 
 /* ------------------------------------------------------------------ *
@@ -471,6 +485,6 @@ if ('serviceWorker' in navigator) {
 /* ------------------------------------------------------------------ *
  * Arranque
  * ------------------------------------------------------------------ */
-renderTodo();
 cablearInstalar();
 arrancarGPSAuto();
+cargarYRender();

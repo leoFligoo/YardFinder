@@ -1,6 +1,6 @@
 // sw.js — Service worker de la PWA del chofer. Cachea el app shell para que
 // el recorrido y la lista funcionen sin señal dentro del playón.
-const CACHE = 'yard-chofer-v4';
+const CACHE = 'yard-chofer-v5';
 const SHELL = [
   './',
   './index.html',
@@ -27,10 +27,11 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache-first para el shell; la red queda para lo demás (API futura).
+// Cache-first para el shell; la API siempre va a la red (orden/retiros frescos).
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  if (new URL(req.url).pathname.startsWith('/api/')) return; // red directa, sin caché
   e.respondWith(
     caches.match(req).then(hit => hit || fetch(req).then(res => {
       const copy = res.clone();

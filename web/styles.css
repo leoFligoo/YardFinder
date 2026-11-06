@@ -2047,3 +2047,11 @@ main:focus-visible {outline:none}
 @media(max-width:480px) {
   .sidebar .nav-item {width:auto; flex:0 0 auto}
 }
+
+/* ───── Despacho: generar orden ───── */
+.chat-order { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.chat-order .button { align-self: flex-start; }
+.chat-order-status { margin: 0; font-size: 13px; color: var(--muted); }
+.chat-order-status.ok { color: var(--green); }
+.chat-order-status.error { color: var(--red); }
+.chat-order-status a { color: var(--yellow); }
