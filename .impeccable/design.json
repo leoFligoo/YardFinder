@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T00:00:00.000Z",
+  "title": "Design System: Yard Finder — Patio",
+  "extensions": {
+    "colorMeta": {
+      "ground": { "role": "neutral", "displayName": "Ground", "canonical": "#11151b", "tonalRamp": ["#11151b", "#20262e", "#303841", "#424b55", "#59636d", "#747e87", "#a0a7ae", "#d5d9dd"] },
+      "panel": { "role": "neutral", "displayName": "Panel", "canonical": "#1b222b", "tonalRamp": ["#11151b", "#1b222b", "#252e39", "#353f4a", "#4b5661", "#69747e", "#98a1a9", "#d0d5da"] },
+      "panel-light": { "role": "neutral", "displayName": "Panel light", "canonical": "#252e39", "tonalRamp": ["#151a20", "#252e39", "#353f4a", "#4a5561", "#626d78", "#808a94", "#aab1b8", "#d9dde1"] },
+      "line": { "role": "neutral", "displayName": "Line", "canonical": "#424b55", "tonalRamp": ["#161b21", "#262d35", "#353e47", "#424b55", "#5c6670", "#7c858e", "#a8afb6", "#d8dce0"] },
+      "text": { "role": "neutral", "displayName": "Text", "canonical": "#f3f4f6", "tonalRamp": ["#17191c", "#292c30", "#3c4045", "#53575d", "#6d7278", "#8c9197", "#b6bbc0", "#f3f4f6"] },
+      "muted": { "role": "neutral", "displayName": "Muted", "canonical": "#c0c7cf", "tonalRamp": ["#1a1d21", "#2b3036", "#41474e", "#5b626a", "#767e87", "#929aa2", "#aeb6be", "#c0c7cf"] },
+      "signal-yellow": { "role": "primary", "displayName": "Signal yellow", "canonical": "#f5c400", "tonalRamp": ["#2c2400", "#574800", "#8c7400", "#b99700", "#d7af00", "#f5c400", "#ffd633", "#fff2b3"] },
+      "located-green": { "role": "secondary", "displayName": "Located green", "canonical": "#50df91", "tonalRamp": ["#102b1d", "#1b4931", "#226540", "#2f9560", "#41bc78", "#50df91", "#8df0b6", "#d7f8e4"] },
+      "alert-red": { "role": "tertiary", "displayName": "Alert red", "canonical": "#ff8585", "tonalRamp": ["#301414", "#552020", "#7a2c2f", "#ae3d42", "#d1545a", "#ff8585", "#ffaaaa", "#ffd2d2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Barlow Condensed ExtraBold", "purpose": "Sign/display labels, headings, lot labels, and prominent metrics; local OFL-licensed font." },
+      "body": { "displayName": "Arial", "purpose": "Interface reading." },
+      "coordinate": { "displayName": "ui-monospace", "purpose": "Plan coordinates and compact location data." }
+    },
+    "breakpoints": [
+      { "name": "tablet", "value": "980px" },
+      { "name": "mobile", "value": "720px" },
+      { "name": "mobile-small", "value": "420px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Destination band and search",
+      "kind": "search",
+      "description": "Broad yellow wayfinding band containing a dark vehicle search field.",
+      "html": "<section class=\"ds-destination-band\"><div><label for=\"ds-vehicle-search\">DESTINO: VEHÍCULO</label></div><div class=\"ds-search-field\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"10.8\" cy=\"10.8\" r=\"6.8\"></circle><path d=\"m16 16 5 5\"></path></svg><input id=\"ds-vehicle-search\" type=\"search\" placeholder=\"ID, VIN, patente, modelo…\"></div></section>",
+      "css": ".ds-destination-band { display: grid; grid-template-columns: minmax(0, .8fr) minmax(240px, 1.2fr); align-items: center; gap: 13px; min-height: 64px; padding: 8px 13px; color: #11151b; background: #f5c400; border: 1px solid #f5c400; border-radius: 3px; } .ds-destination-band label { font: 800 20px/1 'Barlow Condensed', Arial, sans-serif; } .ds-search-field { display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 10px; color: #f5c400; background: #11151b; border: 1px solid #11151b; border-radius: 2px; } .ds-search-field svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; } .ds-search-field input { min-width: 0; border: 0; outline: 0; color: #fff; background: transparent; } .ds-search-field:focus-within { outline: 3px solid #11151b; outline-offset: 3px; }"
+    },
+    {
+      "name": "Compact horizontal navigation",
+      "kind": "nav",
+      "description": "Horizontal top rail with a yellow active Patio item.",
+      "html": "<a class=\"ds-nav-item ds-nav-item-active\" href=\"#/patio\" aria-current=\"page\">Patio</a>",
+      "css": ".ds-nav-item { display: inline-flex; align-items: center; min-height: 38px; padding: 8px 12px; border-radius: 3px; color: #d4d9de; font: 800 14px/1.2 'Barlow Condensed', Arial, sans-serif; text-decoration: none; } .ds-nav-item:hover { background: #252e39; color: #fff; } .ds-nav-item:focus-visible { outline: 3px solid #f5c400; outline-offset: 3px; } .ds-nav-item-active { background: #f5c400; color: #11151b; }"
+    },
+    {
+      "name": "Compact metric strip",
+      "kind": "custom",
+      "description": "Inline summary figures with dividers, subordinate to the six-lot plan.",
+      "html": "<section class=\"ds-stats\" aria-label=\"Resumen de la distribución\"><article class=\"ds-stat\"><strong>120</strong><span>Autos ubicados</span></article><article class=\"ds-stat\"><strong>6</strong><span>Lotes</span></article></section>",
+      "css": ".ds-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 0; padding: 3px 0; border-block: 1px solid #414950; } .ds-stat { display: inline-flex; align-items: baseline; gap: 7px; padding: 0 13px; border-right: 1px solid #414950; color: #c0c7cf; font: 400 10px/1.4 Arial, sans-serif; } .ds-stat strong { color: #f3f4f6; font: 800 14px/1 'Barlow Condensed', Arial, sans-serif; font-variant-numeric: tabular-nums; } .ds-stat:first-child strong { color: #50df91; }"
+    },
+    {
+      "name": "Six-lot plan selection",
+      "kind": "custom",
+      "description": "Dark gridded plan; green locates vehicles and yellow distinguishes the selected vehicle.",
+      "html": "<div class=\"ds-yard-viewport\"><svg aria-label=\"Distribución de seis lotes\"><g class=\"ds-yard-car\" aria-pressed=\"true\"><rect class=\"ds-yard-bay\"></rect><text class=\"ds-yard-coordinate\">1,1</text></g></svg></div>",
+      "css": ".ds-yard-viewport { border: 1px solid #59636d; border-radius: 2px; background-color: #1b222b; } .ds-yard-car { color: #50df91; } .ds-yard-car[aria-pressed=\"true\"] { color: #f5c400; } .ds-yard-car[aria-pressed=\"true\"] .ds-yard-bay { fill: #f5c40028; stroke: #f5c400; stroke-width: 2.4; } .ds-yard-coordinate { fill: #c7d4ce; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }"
+    },
+    {
+      "name": "Selected vehicle card",
+      "kind": "card",
+      "description": "Squared high-contrast yellow sign for existing read-only vehicle detail.",
+      "html": "<aside class=\"ds-vehicle-card\" aria-labelledby=\"ds-vehicle-title\"><h2 id=\"ds-vehicle-title\">Auto #012</h2><dl><div><dt>Coordenadas</dt><dd>(1, 1)</dd></div></dl></aside>",
+      "css": ".ds-vehicle-card { padding: 16px; border: 1px solid #f5c400; border-radius: 2px; color: #11151b; background: #f5c400; } .ds-vehicle-card h2 { margin: 0 0 12px; font: 800 20px/1.1 'Barlow Condensed', Arial, sans-serif; } .ds-vehicle-card dl > div { display: flex; justify-content: space-between; gap: 8px; margin: 8px 0; } .ds-vehicle-card dt { color: #37320f; } .ds-vehicle-card dd { margin: 0; font-weight: 700; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Señalización de orientación",
+    "overview": "Patio is a wayfinding system for locating a specific vehicle, not a fleet dashboard. The six-lot plan is the destination; the selected vehicle's lot and coordinates become an unmistakable sign. This documents the selected direction for the new /ui Patio system. interfaz.html legacy configuration and processing remain untouched and retain their previous system; these tokens do not apply to legacy.",
+    "keyCharacteristics": [
+      "Terminal wayfinding: charcoal ground, durable white labels, and a broad signal-yellow destination band.",
+      "Green means a confirmed located vehicle; yellow means destination, action, or selection.",
+      "Compact horizontal navigation and metric strip keep the six-lot plan dominant."
+    ],
+    "rules": [
+      { "name": "State-Color Rule", "body": "Keep yellow for destination/action/selection and green for located state; do not use them interchangeably.", "section": "colors" },
+      { "name": "Legacy Boundary", "body": "Patio /ui tokens apply only to Patio; interfaz.html configuration and processing retain their previous system.", "section": "overview" }
+    ],
+    "dos": [
+      "Do keep the six-lot plan primary and the metric strip secondary.",
+      "Do preserve visible focus and the compact squared wayfinding language.",
+      "Do keep Patio tokens scoped to /ui."
+    ],
+    "donts": [
+      "Don't infer dispatch availability from empty positions or imply viewing reserves a vehicle.",
+      "Don't use yellow and green interchangeably.",
+      "Don't apply Patio styling to legacy interfaz.html configuration or processing."
+    ]
+  }
+}

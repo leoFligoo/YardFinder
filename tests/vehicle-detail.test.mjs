@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {generateYard, assignInventory, findPosition} from '../web/yard-layout.js';
 import {vehicleDetailRows} from '../web/vehicle-detail.js';
-import {inventoryImageUrl, normalizeInventory} from '../web/data.js';
+import {formatFlightDate, inventoryImageUrl, normalizeInventory} from '../web/data.js';
 
 const auto = {id:62, vuelo_id:1, posicion:{loteId:1,x:4,y:5}, tag:261,
   modelo:'Fiat Cronos Drive', color:'Beige', conf:0.721, recorte:'/api/patio/recortes/1/62'};
@@ -40,4 +40,10 @@ test('crop URLs must match the exact flight and observation', () => {
   for (const recorte of ['https://external.invalid/image.jpg','/etc/passwd','/api/patio/recortes/2/62']) {
     assert.throws(()=>inventoryImageUrl({...auto,recorte}),/inválida/);
   }
+});
+test('flight dates are formatted for local operators and malformed values stay explicit', () => {
+  assert.match(formatFlightDate('2026:10:14 10:00:00'), /2026/);
+  assert.equal(formatFlightDate('not-a-date'), 'fecha no disponible');
+  assert.equal(formatFlightDate(null), 'fecha no disponible');
+  assert.equal(formatFlightDate('2026:10:14 99:00:00'), 'fecha no disponible');
 });

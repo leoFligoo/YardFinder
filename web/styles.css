@@ -154,6 +154,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[t
   box-shadow:0 4px 20px #ffc92810;
 }
 
+.nav-item[data-pending] {
+  color:#8994a3;
+}
+
+.nav-item[data-pending]:hover {
+  color:#d5dbe4;
+}
+
+.nav-state {
+  margin-left:auto;
+  color:#7e8998;
+  font-size:9px;
+  font-weight:500;
+  white-space:nowrap;
+}
+
 .active-dot {
   width:6px;
   height:6px;
@@ -261,17 +277,43 @@ main {
 }
 
 h1 {
-  font-size:clamp(25px,2.4vw,37px);
-  letter-spacing:-1.1px;
+  font-size:clamp(30px,3vw,44px);
+  letter-spacing:-1.3px;
   line-height:1.2;
   margin:0;
-  font-weight:730;
+  font-weight:800;
 }
 
 .page-heading p {
   margin:9px 0 0;
   color:var(--muted);
   font-size:14px;
+}
+
+.page-heading .inventory-status {
+  min-height:17px;
+  margin-top:6px;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+
+.inventory-status [role="alert"] {
+  color:var(--red);
+}
+
+.inventory-status .button {
+  margin-left:10px;
+  padding:5px 9px;
+  font-size:11px;
+}
+
+.upcoming-action {
+  color:#c3ccda;
+}
+
+.upcoming-action .soon {
+  border-color:#756223;
+  color:var(--muted);
 }
 
 .heading-action {
@@ -326,6 +368,10 @@ h1 {
   background:transparent;
 }
 
+.button.outline.upcoming-action {
+  color:#c3ccda;
+}
+
 .outline:hover {
   background:#ffc92812;
 }
@@ -373,10 +419,15 @@ h1 {
 }
 
 .stat strong {
-  font-size:32px;
+  font-size:36px;
   line-height:1.1;
   letter-spacing:-.7px;
   display:block;
+  font-weight:760;
+}
+
+.stat:first-child strong {
+  color:var(--green);
 }
 
 .stat span:not(.stat-tag):not(.stat-dot) {
@@ -1101,7 +1152,7 @@ dialog p {
     width:25px;
   }
   .stat strong {
-    font-size:28px;
+    font-size:31px;
   }
   .stat span:not(.stat-tag):not(.stat-dot) {
     font-size:11px;
@@ -1128,6 +1179,9 @@ dialog p {
     max-width:135px;
   }
   .topbar-status {
+    display:none;
+  }
+  .nav-state {
     display:none;
   }
 }
@@ -1178,7 +1232,7 @@ dialog p {
     display:none;
   }
   .stat strong {
-    font-size:28px;
+    font-size:30px;
   }
   h1 {
     font-size:29px;
@@ -1359,7 +1413,7 @@ dialog p {
     font-size:10px;
   }
   .stat strong {
-    font-size:26px;
+    font-size:28px;
   }
   .stat {
     gap:10px;
@@ -1621,14 +1675,17 @@ dialog p {
 
 /* The yard diagram is the sole map on Patio. Its geometry is shared with routing. */
 .yard-board-heading {
-  padding: 22px 24px;
+  padding: 26px 28px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
 }
 .yard-board-heading h2 {
-  font-size: 19px;
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.1;
+  letter-spacing: -0.7px;
+  margin: 0;
 }
 .yard-board-heading p {
   margin: 5px 0 0;
@@ -1671,13 +1728,13 @@ dialog p {
   margin-left: 6px;
 }
 .yard-viewport {
-  margin: 0 14px;
+  margin: 0 18px;
   overflow: hidden;
-  border: 1px solid #2d3945;
+  border: 1px solid #3a4652;
   border-radius: 8px;
   background: #111820;
-  background-image: radial-gradient(#293340 1px, transparent 1px);
-  background-size: 16px 16px;
+  background-image: radial-gradient(#35414d 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 .yard-plan {
   display: block;
@@ -1691,9 +1748,15 @@ dialog p {
   outline: none;
 }
 .yard-perimeter {
-  fill: #17212a;
-  stroke: #4a5864;
-  stroke-width: 2;
+  fill: #19242d;
+  stroke: none;
+}
+.yard-perimeter-outline {
+  fill: none;
+  stroke: #65727d;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 .yard-road-layer {
   fill: none;
@@ -1705,21 +1768,21 @@ dialog p {
   opacity: .7;
 }
 .yard-lot-outline {
-  fill: none;
-  stroke: #4e8a6e;
-  stroke-width: 1.2;
+  fill: #50df9108;
+  stroke: #68a988;
+  stroke-width: 1.8;
   pointer-events: none;
 }
 .yard-lot-title {
-  fill: #e4ecec;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  fill: #f3f4f6;
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: 1.3px;
 }
 .yard-lot-count {
-  fill: #68db9d;
-  font-size: 12px;
-  font-weight: 550;
+  fill: #72e6a5;
+  font-size: 13px;
+  font-weight: 650;
 }
 .yard-car {
   color: #4fd38a;
