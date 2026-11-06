@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#14171c">
+<title>Yard Finder · Chofer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" class="pin" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+    <div>
+      <div class="brand-name">YARD FINDER</div>
+      <div class="brand-sub">Chofer · retiro</div>
+    </div>
+  </div>
+  <button id="chip-gps" class="chip chip-gps" type="button" title="Compartir mi ubicación">
+    <span class="dot"></span><span id="chip-gps-txt">GPS</span>
+  </button>
+</header>
+
+<main id="main">
+
+  <!-- ============ RECORRIDO ============ -->
+  <section class="view view-recorrido active" data-view="recorrido">
+    <div class="orden-head">
+      <div>
+        <div class="orden-id" id="orden-id">OR —</div>
+        <div class="orden-dest" id="orden-dest"></div>
+      </div>
+      <div class="orden-prog">
+        <b id="orden-prog-n">0/0</b>
+        <span>retirados</span>
+      </div>
+    </div>
+
+    <div id="yard" class="yard"><!-- mapa del playón (JS) --></div>
+
+    <div class="legend">
+      <span><i class="g-car retirar"></i>A retirar</span>
+      <span><i class="g-car retirado"></i>Retirado</span>
+      <span><i class="g-car patio"></i>En patio</span>
+    </div>
+
+    <h2 class="section-title">Próximo auto</h2>
+    <div id="proximo"><!-- card (JS) --></div>
+
+    <h2 class="section-title">Pendientes del recorrido</h2>
+    <div id="lista-pend" class="lista"><!-- items (JS) --></div>
+  </section>
+
+  <!-- ============ ESCANEAR ============ -->
+  <section class="view view-escanear" data-view="escanear">
+    <div class="scan-wrap">
+      <video id="cam" playsinline muted></video>
+      <canvas id="cam-canvas" hidden></canvas>
+      <div class="scan-overlay">
+        <div class="scan-frame"><span></span><span></span><span></span><span></span></div>
+        <p class="scan-hint" id="scan-hint">Apuntá al tag del techo</p>
+        <p class="scan-diag" id="scan-diag"></p>
+      </div>
+      <div id="scan-off" class="scan-off">
+        <svg viewBox="0 0 24 24" class="cam-ico" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm8 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+        <p>La cámara lee el AprilTag del techo para confirmar el auto.</p>
+        <button id="btn-cam" class="btn btn-prim" type="button">Encender cámara</button>
+      </div>
+    </div>
+    <div class="scan-actions">
+      <button id="btn-manual" class="btn" type="button">Ingresar tag a mano</button>
+    </div>
+  </section>
+
+  <!-- ============ MI GPS ============ -->
+  <section class="view view-gps" data-view="gps">
+    <h2 class="section-title">Mi ubicación</h2>
+    <p class="muted">Se comparte con el operador de planta para coordinar el retiro.</p>
+
+    <div class="gps-card">
+      <div class="gps-state" id="gps-state">
+        <span class="dot" id="gps-dot"></span>
+        <b id="gps-state-txt">Ubicación en pausa</b>
+      </div>
+      <dl class="gps-data">
+        <div><dt>Latitud</dt><dd id="gps-lat">—</dd></div>
+        <div><dt>Longitud</dt><dd id="gps-lon">—</dd></div>
+        <div><dt>Precisión</dt><dd id="gps-acc">—</dd></div>
+        <div><dt>Último envío</dt><dd id="gps-env">—</dd></div>
+      </dl>
+      <button id="btn-gps" class="btn btn-prim" type="button">Compartir ubicación</button>
+      <a id="gps-maps" class="btn" target="_blank" rel="noopener" hidden>Ver en el mapa</a>
+    </div>
+
+    <div class="orden-info">
+      <h2 class="section-title">Orden</h2>
+      <dl class="gps-data">
+        <div><dt>Orden</dt><dd id="info-orden">—</dd></div>
+        <div><dt>Destino</dt><dd id="info-dest">—</dd></div>
+        <div><dt>Transportista</dt><dd id="info-transp">—</dd></div>
+      </dl>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar">
+  <button class="tab active" data-go="recorrido">
+    <svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2V6Zm6 0v12m6-10v12"/></svg>
+    <span>Recorrido</span>
+  </button>
+  <button class="tab" data-go="escanear">
+    <svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4V7Zm8 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+    <span>Escanear</span>
+  </button>
+  <button class="tab" data-go="gps">
+    <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+    <span>Mi GPS</span>
+  </button>
+</nav>
+
+<!-- Hoja de detalle / confirmación -->
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-bg" data-close></div>
+  <div class="sheet-card" id="sheet-card"><!-- JS --></div>
+</div>
+
+<!-- Banner: instalar como app -->
+<div id="install" class="install" hidden>
+  <svg viewBox="0 0 24 24" class="install-ico" aria-hidden="true"><path d="M12 3v10m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+  <div class="install-body">
+    <b>Instalar Yard Finder</b>
+    <span id="install-txt">Agregala a tu pantalla y usala como app.</span>
+  </div>
+  <div class="install-actions">
+    <button id="install-no" class="btn" type="button">Ahora no</button>
+    <button id="install-go" class="btn btn-prim" type="button">Instalar</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
