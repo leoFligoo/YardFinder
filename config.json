@@ -1,0 +1,11 @@
+{
+ "carpeta_videos": "",
+ "lotes": "",
+ "camara": "principal",
+ "hfov": 71.6,
+ "cada_m": 15.0,
+ "alt_min": 10.0,
+ "conf": 0.2,
+ "yaw_modo": "auto",
+ "yaw": 0.0
+}

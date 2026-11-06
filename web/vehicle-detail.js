@@ -45,7 +45,7 @@ export function createVehicleDetail({onClose}) {
     photo.onerror = () => {
       if (currentRequest !== requestId) return;
       photo.hidden = true;
-      imageStatus.hidden = false; imageStatus.textContent = 'Recorte no disponible.';
+      imageStatus.hidden = false; imageStatus.textContent = 'No se pudo cargar el recorte. Los datos del vehículo siguen disponibles.';
     };
     try { photo.src = inventoryImageUrl(auto); } catch { photo.onerror(); }
     if (window.matchMedia('(max-width: 980px)').matches) card.scrollIntoView({block: 'nearest'});

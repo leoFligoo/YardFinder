@@ -82,4 +82,16 @@ export async function fetchInventory(path) {
   }
   return response.json();
 }
+export function formatFlightDate(value) {
+  if (typeof value !== 'string') return 'fecha no disponible';
+  const match = value.match(/^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+  if (!match) return 'fecha no disponible';
+  const [, year, month, day, hour, minute, second] = match;
+  if (+hour > 23 || +minute > 59 || +second > 59) return 'fecha no disponible';
+  const date = new Date(+year, +month - 1, +day, +hour, +minute, +second);
+  if (date.getFullYear() !== +year || date.getMonth() !== +month - 1 || date.getDate() !== +day) {
+    return 'fecha no disponible';
+  }
+  return new Intl.DateTimeFormat('es-AR', {dateStyle: 'medium', timeStyle: 'short'}).format(date);
+}
 export const loadPatio = async () => normalizeInventory(await fetchInventory('/api/patio'));
