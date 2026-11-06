@@ -1925,6 +1925,40 @@ dialog p {
 .yard-empty .yard-coordinate { fill: #8995a2; }
 .heading-action { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
+/* ───────────── Planificar por chat ───────────── */
+.chat-dialog { max-width: 540px; }
+.chat-dialog h2 { display: flex; align-items: center; gap: 8px; font-size: 18px; margin: 0; }
+.chat-dialog h2 [data-icon] { color: var(--yellow); }
+.chat-form { display: flex; gap: 8px; margin: 4px 0 8px; }
+.chat-form input {
+  flex: 1; min-width: 0; background: var(--bg); color: var(--text);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+}
+.chat-form input:focus-visible { border-color: var(--yellow); outline: none; }
+.chat-result { margin-top: 4px; max-height: 46vh; overflow-y: auto; }
+.chat-result p { margin: 8px 0; }
+.chat-summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.chat-mode { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; letter-spacing: .04em; }
+.chat-mode.ia { background: #2a2140; color: #c9b6ff; }
+.chat-mode.local { background: #1f2a24; color: var(--green); }
+.chat-count { color: var(--text); font-size: 14px; font-weight: 600; }
+.chat-error { color: var(--red); font-size: 14px; }
+.chat-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; counter-reset: paso; }
+.chat-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--panel-light); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px;
+}
+.chat-item::before {
+  counter-increment: paso; content: counter(paso);
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--yellow); color: #14171c; font-size: 12px; font-weight: 700;
+  display: grid; place-items: center;
+}
+.chat-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.chat-item-info strong { font-size: 14px; }
+.chat-item-sub { font-size: 12px; color: var(--muted); }
+.chat-tag { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chat-menu { display: flex; justify-content: flex-end; margin: 16px 0 0; padding: 0; }
 /* UI 02: registry and unmatched observations share the local shell. */
 main:focus-visible {outline:none}
 .page-actions {display:flex; gap:10px; align-items:center; flex-wrap:wrap}

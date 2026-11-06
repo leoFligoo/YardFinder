@@ -2,6 +2,7 @@ import {loadPatio} from './data.js';
 import {renderIcons} from './icons.js';
 import {renderYardLayout} from './yard-layout.js';
 import {createVehicleDetail} from './vehicle-detail.js';
+import './dispatch.js';
 import {createInventory} from './inventory.js';
 import {parseRoute} from './router.js';
 

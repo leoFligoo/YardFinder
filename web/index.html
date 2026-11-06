@@ -29,7 +29,7 @@
     <main id="contenido" tabindex="-1">
       <div id="patio-page">
       <p id="patio-route-message" class="route-message" role="status" hidden></p>
-      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="page-actions"><button id="refresh-patio" class="button outline" type="button"><span data-icon="reset"></span>Actualizar</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Abrir Chat<span class="soon">Próximamente</span></button></div></section>
+      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="page-actions"><button id="refresh-patio" class="button outline" type="button"><span data-icon="reset"></span>Actualizar</button><button class="button primary" id="open-chat" data-open-chat type="button"><span data-icon="chat"></span>Abrir Chat</button></div></section>
       <section class="stats" aria-label="Resumen de la distribución">
         <article class="stat"><div class="stat-icon green" data-icon="car"></div><div><strong id="available-count">—</strong><span>Autos observados</span><small class="muted">Incluye autos sin identificar</small></div></article>
         <article class="stat"><div class="stat-icon" data-icon="layers"></div><div><strong id="lot-count">—</strong><span>Lotes</span></div></article>
@@ -50,7 +50,7 @@
       <section id="inventory-page" aria-labelledby="inventory-title" hidden>
         <header class="page-heading inventory-heading">
           <div><h1 id="inventory-title">Inventario</h1><p id="inventory-subtitle">Consultando registros…</p></div>
-          <div class="page-actions"><button id="refresh-inventory" class="button outline" type="button"><span data-icon="reset"></span>Actualizar</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Abrir Chat<span class="soon">Próximamente</span></button></div>
+          <div class="page-actions"><button id="refresh-inventory" class="button outline" type="button"><span data-icon="reset"></span>Actualizar</button><button class="button primary" data-open-chat type="button"><span data-icon="chat"></span>Abrir Chat</button></div>
         </header>
         <div class="inventory-metrics" aria-label="Resumen del inventario">
           <article><span>Vehículos registrados</span><strong data-count="registrados">—</strong><small>En el catálogo</small></article>
@@ -98,5 +98,15 @@
     </main>
   </div>
   <dialog id="pending-dialog" aria-labelledby="pending-title"><span class="dialog-icon" data-icon="layers"></span><h2 id="pending-title">Próxima pantalla</h2><p id="pending-description"></p><button id="close-dialog" class="button primary">Entendido</button></dialog>
+  <dialog id="chat-dialog" class="chat-dialog" aria-labelledby="chat-title">
+    <h2 id="chat-title"><span data-icon="chat"></span> Planificar por chat</h2>
+    <p class="small-note">Decime qué autos necesitás, en lenguaje natural. Ej.: «5 Cronos blancos del lote 4», «todos los Amarok», «las Hilux gris plata».</p>
+    <form id="chat-form" class="chat-form">
+      <input id="chat-input" type="text" autocomplete="off" placeholder="Buscar autos en el patio…" aria-label="Pedido de despacho" required>
+      <button class="button primary" type="submit">Buscar</button>
+    </form>
+    <div id="chat-result" class="chat-result" aria-live="polite"></div>
+    <menu class="chat-menu"><button id="chat-close" class="button outline" type="button">Cerrar</button></menu>
+  </dialog>
 </body>
 </html>
