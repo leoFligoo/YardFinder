@@ -1,0 +1,16 @@
+{
+  "name": "Yard Finder · Chofer",
+  "short_name": "Yard Chofer",
+  "description": "Recorrido del playón, GPS y lectura de AprilTag para el retiro de autos.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14171c",
+  "theme_color": "#14171c",
+  "lang": "es-AR",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
