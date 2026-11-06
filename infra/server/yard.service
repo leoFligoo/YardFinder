@@ -1,0 +1,20 @@
+[Unit]
+Description=Yard Finder app
+After=network.target
+
+[Service]
+User=yard
+Group=yard
+WorkingDirectory=/opt/yard/current
+EnvironmentFile=/etc/yard/yard.env
+ExecStart=/opt/yard/venv/bin/python ${YARD_ENTRYPOINT}
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/yard
+
+[Install]
+WantedBy=multi-user.target

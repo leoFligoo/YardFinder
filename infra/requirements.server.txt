@@ -1,0 +1,6 @@
+# Lean runtime for the deployed server (operator UI + read-only API).
+# procesar_vuelo.py imports cv2/numpy/PIL at module level; ultralytics/torch are
+# imported lazily and are NOT needed unless flights are processed on the server.
+opencv-python-headless>=4.8
+numpy
+pillow>=10
