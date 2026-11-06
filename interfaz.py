@@ -3,7 +3,8 @@ Interfaz web local del inventario con drone.
 
     python interfaz.py            (o doble clic en iniciar_interfaz.bat)
 
-Abre el navegador en http://127.0.0.1:8765 con tres pasos:
+Abre la UI del operador en http://127.0.0.1:8765/ui/#/patio.
+El procesamiento de vuelos sigue disponible en http://127.0.0.1:8765 con tres pasos:
   1. Configuración: carpeta de los videos, archivo de lotes y parámetros de procesamiento.
   2. Videos: lista de los MP4 de la carpeta (con o sin .SRT, ya procesados o no) y botón para procesarlos.
   3. Resultados: cada vuelo procesado, con su mapa.
@@ -33,7 +34,7 @@ except ImportError:
     # Sin el stack del drone (cv2/numpy/PIL) la UI, el patio y el despacho por
     # chat funcionan igual; solo el procesamiento de videos queda deshabilitado.
     pv = None
-from inventario_ui import InventarioError, leer_patio, resolver_recorte
+from inventario_ui import InventarioError, leer_patio, leer_inventario, resolver_recorte
 
 PUERTO = 8765
 BASE = pv.BASE if pv else Path(__file__).resolve().parent
@@ -244,8 +245,10 @@ class Manejador(BaseHTTPRequestHandler):
 
     def do_GET(self):
         ruta = unquote(urlparse(self.path).path)
-        if ruta == '/api/patio' or ruta.startswith('/api/patio/recortes/'):
+        if ruta in {'/api/patio', '/api/inventario'} or ruta.startswith('/api/patio/recortes/'):
             try:
+                if ruta == '/api/inventario':
+                    return self._json(leer_inventario(BASE))
                 if ruta == '/api/patio':
                     return self._json(leer_patio(BASE))
                 match = re.fullmatch(r'/api/patio/recortes/(\d+)/(\d+)', ruta)
@@ -317,7 +320,7 @@ class Servidor(ThreadingHTTPServer):
 
 
 def main():
-    url = f"http://127.0.0.1:{PUERTO}"
+    url = f"http://127.0.0.1:{PUERTO}/ui/#/patio"
     try:
         servidor = Servidor(("127.0.0.1", PUERTO), Manejador)
     except OSError as e:

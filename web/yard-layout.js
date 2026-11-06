@@ -51,6 +51,7 @@ function svgNode(name, attributes = {}, text) {
 export function renderYardLayout(container, {autos = [], onSelect = () => {}, onClear = () => {}} = {}) {
   const yard = assignInventory(generateYard(), autos);
   const geometry = buildYardGeometry(yard);
+  const selectors = new Map();
   container.innerHTML = `
     <section class="panel yard-board" aria-labelledby="yard-title">
       <div class="yard-board-heading">
@@ -121,6 +122,9 @@ export function renderYardLayout(container, {autos = [], onSelect = () => {}, on
         onSelect(position);
       };
       group.addEventListener('click', select);
+      if (position.auto) selectors.set(`${position.auto.vuelo_id}:${position.auto.id}`, () => {
+        select(); group.focus({preventScroll: true});
+      });
       group.addEventListener('keydown', event => {
         if (event.key === 'Enter' || event.key === ' ') {event.preventDefault(); select();}
       });
@@ -197,5 +201,9 @@ export function renderYardLayout(container, {autos = [], onSelect = () => {}, on
     }
   });
   applyView();
-  return {yard, geometry, clearSelection};
+  return {yard, geometry, clearSelection, selectAuto(vuelo, id) {
+    const select = selectors.get(`${vuelo}:${id}`);
+    select?.();
+    return !!select;
+  }};
 }

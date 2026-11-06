@@ -87,12 +87,12 @@ async function buscar(texto) {
   }
 }
 
-if ($('open-chat') && dialog) {
-  $('open-chat').addEventListener('click', () => {
+if (dialog) {
+  document.querySelectorAll('[data-open-chat]').forEach(button => button.addEventListener('click', () => {
     dialog.showModal();
     renderIcons();
     input.focus();
-  });
+  }));
   $('chat-close').addEventListener('click', () => dialog.close());
   form.addEventListener('submit', e => {
     e.preventDefault();
