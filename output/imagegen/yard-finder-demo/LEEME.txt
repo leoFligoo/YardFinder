@@ -1,0 +1,11 @@
+YARD FINDER — PANTALLAS DE DEMO
+
+8 mockups generados con Imagegen integrado. Son referencias visuales estáticas; no implementan la aplicación.
+
+Orden: 01 Patio, 02 Inventario, 03 Detalle de vehículo, 04 Nueva orden, 05 Ruta, 06 Pasadas, 07 Excepciones, 08 Reporte.
+
+Datos sintéticos: 200 registrados, 192 ubicados, 8 sin ubicar; 4 fuera de sector incluidos entre los ubicados. La pasada muestra un estado intermedio. Orden CAM-024: 12 Cronos blancos.
+
+Los mapas son esquemáticos. VINs, tags, imágenes, distancias y tiempos son ilustrativos; no son evidencia de detección ni de rendimiento. El marcador dibujado en el techo no es un AprilTag validado. Para implementación usar el dataset y la geometría reales del proyecto.
+
+Los prompts originales y las correcciones están en prompts.json.
