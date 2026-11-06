@@ -46,7 +46,7 @@ El plano consulta **`GET /api/patio`**, que abre `inventario.db` en modo de solo
 Se usa el último vuelo por `fecha DESC, id DESC`, sin mezclar observaciones históricas.
 Cada auto se ubica por **`lote + pos_x + pos_y`** y sus datos se unen con `vehiculos` por `tag`.
 Los IDs no determinan las posiciones: por ejemplo, Auto #062 está en lote 1, `(4,5)`.
-`Actualizar patio` vuelve a leer SQLite y cierra cualquier ficha anterior; no hay actualización automática.
+`Actualizar` vuelve a leer SQLite y cierra cualquier ficha anterior; no hay actualización automática.
 
 Las posiciones inválidas o duplicadas producen un error visible con reintento; no se sustituyen
 por datos de ejemplo. Un vuelo vacío muestra el plano sin autos. Los campos ausentes permanecen

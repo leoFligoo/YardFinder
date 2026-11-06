@@ -1927,7 +1927,7 @@ dialog p {
 
 /* UI 02: registry and unmatched observations share the local shell. */
 main:focus-visible {outline:none}
-.inventory-actions {display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.page-actions {display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 .inventory-heading {margin-bottom:24px}
 .inventory-metrics {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:28px}
 .inventory-metrics article {border:1px solid var(--line); border-radius:9px; background:linear-gradient(125deg,#1d232d,#151a22); padding:18px 20px}
@@ -2006,8 +2006,8 @@ main:focus-visible {outline:none}
   .inventory-context {align-items:flex-start; flex-direction:column; gap:8px}
   .inventory-pagination {flex-wrap:wrap; padding:12px; gap:12px; justify-content:space-between}
   .inventory-pagination label {width:100%}
-  .inventory-actions {gap:8px}
-  .inventory-actions .button {font-size:12px}
+  .page-actions {gap:8px}
+  .page-actions .button {font-size:12px}
   .inventory-disclaimer {margin-left:0; line-height:1.6}
 }
 @media(max-width:480px) {
