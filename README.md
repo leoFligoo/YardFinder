@@ -22,29 +22,29 @@ La instalación necesita Internet; la aplicación sirve sus mapas, imágenes y b
 Con el mismo servidor activo, abrir **http://127.0.0.1:8765/ui/#/patio**.
 No requiere instalar paquetes ni compilar el frontend.
 
-**Distribución del patio:** 6 lotes de 20 autos, cada uno con **4 columnas × 5 filas**.
-La sección desplegable «Distribución del patio» permite consultar sus 120 posiciones.
-`x` es la columna (1–4) e `y` la fila (1–5), con origen en la esquina superior izquierda
-de cada lote. La dirección completa incluye el lote: `Lote 3 · (2,4)`, ID `L3-X2-Y4`.
-El generador está en `web/yard-layout.js`. No asigna autos ni inventa coordenadas geográficas:
-la vinculación de estas posiciones con detecciones o píxeles de una imagen está pendiente.
-Los 5 sectores y 123 detecciones del ejemplo fotográfico inferior siguen siendo datos de referencia,
-distintos de los 6 lotes y 120 lugares configurados.
+**Distribución del patio:** plano interactivo con 6 lotes de 20 posiciones, cada uno con
+**4 columnas × 5 filas**. Los autos se dibujan en horizontal y cada lote tiene una calle
+izquierda, una central entre las columnas 2 y 3, y una derecha. Tres calles transversales
+conectan los lotes y los accesos señalizados de **Entrada** y **Salida**.
 
-- Vista cenital con las dos ortofotos locales, sectores, zoom y selección de autos.
-- Búsqueda por VIN, tag o ID (`#042`), filtro por sector, capas y restablecimiento de vista.
-- Recorte y datos de la observación seleccionada, accesibles también desde los resultados de búsqueda.
-- El Patio inicial muestra el mapa y permite consultar observaciones. La selección múltiple
-  para despacho **no aparece en esta pantalla**.
-- Contadores calculados: 123 detecciones con coordenadas, 0 sin ubicación, 25 fuera de sector,
-  5 sectores y 12 tags. **Estar fuera de un sector no significa carecer de ubicación.**
-- Diseño adaptable a escritorio y móvil; estados de carga, error con reintento y búsqueda vacía.
+- Cada lote muestra «20 disponibles». Los contadores se calculan de esta distribución de ejemplo.
+- Click, Enter o Espacio sobre un auto consulta su lote, columna y fila; no lo reserva para despacho.
+- Zoom con +/−, desplazamiento por arrastre al acercar y «Ver todo» para restaurar el plano.
+- `x` es la columna (1–4), `y` la fila (1–5), con origen arriba a la izquierda de cada lote.
+  Ejemplo: `Lote 3 · (2,4)`, ID `L3-X2-Y4`.
+- Se eliminan el mapa fotográfico y su buscador de VIN/tag/ID de esta pantalla.
 
-Se usa una copia de los datos de `ejemplo_resultado/mapa.html` en `web/data/patio.json`,
-sin cambiar coordenadas ni duplicar las imágenes. Es un ejemplo precalculado, no el inventario SQLite
-en vivo ni una pasada nueva del DJI Air 3S. La precisión y los solapamientos de las ortofotos
-son los del ejemplo original. El enlace al mapa de resultados utiliza `salida/demo_local`, generado
-por `preparar_demo.py` en la preparación local.
+`web/yard-layout.js` genera las posiciones y dibuja el SVG interactivo.
+`web/yard-geometry.js` define el plano, calles, accesos, nodos y aristas de circulación.
+Cada posición tiene `accessNodeId`, un punto de recogida sobre una calle, para que el futuro
+recorrido no cruce autos estacionados. Los ejes y costos usan unidades del dibujo, **no metros
+ni coordenadas GPS**. La red es conceptual y bidireccional; no modela todavía radios de giro,
+sentidos únicos ni restricciones físicas de un camión.
+
+La disponibilidad es simulada: todas las posiciones del ejemplo están disponibles.
+Esta vista no consulta `inventario.db` ni el snapshot de 123 detecciones. La integración con
+el inventario real y el cálculo/dibujo del recorrido quedan pendientes. Los archivos originales,
+ortofotos y el mapa de resultados siguen disponibles en el flujo anterior del servidor (`/`).
 
 Solo Patio está implementado en esta entrega. Los accesos restantes explican que están pendientes;
 el chat, la selección de hasta 8 autos y el recorrido se incorporan en sus siguientes PRs.
@@ -82,11 +82,12 @@ seleccionados superpuestos. También están disponibles como [ZIP](output/imageg
 |---|---|
 | `interfaz.html` | UI principal, estilos y JavaScript |
 | `web/index.html`, `web/styles.css`, `web/icons.js` | Nueva UI y estructura visual compartida en `/ui/` |
-| `web/app.js`, `web/map.js` | Pantalla Patio e interacción del mapa Leaflet |
+| `web/app.js` | Pantalla Patio y navegación |
 | `web/data.js`, `web/state.js` | Adaptador de datos y estado compartido para las siguientes pantallas |
-| `web/yard-layout.js` | Generador de 6 lotes × 20 posiciones con coordenadas locales X/Y |
+| `web/yard-layout.js` | Generador y plano SVG interactivo de 6 lotes × 20 posiciones |
+| `web/yard-geometry.js` | Calles, entrada/salida y red de circulación compartida con futuras rutas |
 | `web/vehicle-list.js` | Componente reservado para coincidencias del chat; no montado en Patio |
-| `web/data/patio.json` | Snapshot del ejemplo local con procedencia explícita |
+| `web/data/patio.json` | Snapshot histórico de observaciones; no consumido por el Patio actual |
 | `plantilla_mapa.html` | Mapa y buscador de vehículos |
 | `interfaz.py` | Servidor local y API |
 | `vendor/leaflet/` | Biblioteca y recursos del mapa offline |

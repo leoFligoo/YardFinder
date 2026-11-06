@@ -1618,3 +1618,240 @@ dialog p {
   background-position: right 12px center;
   background-size: 12px 12px;
 }
+
+/* The yard diagram is the sole map on Patio. Its geometry is shared with routing. */
+.yard-board-heading {
+  padding: 22px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.yard-board-heading h2 {
+  font-size: 19px;
+}
+.yard-board-heading p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.yard-board-heading p span {
+  margin: 0 7px;
+  color: #586575;
+}
+.yard-controls {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.yard-controls button, #yard-clear {
+  border: 1px solid #3a4655;
+  border-radius: 6px;
+  background: #242c38;
+  min-width: 34px;
+  height: 34px;
+  font-size: 20px;
+}
+.yard-controls button:hover, #yard-clear:hover {
+  border-color: var(--yellow);
+}
+.yard-controls button:disabled {
+  opacity: .4;
+  cursor: default;
+}
+.yard-controls output {
+  min-width: 47px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.yard-controls .yard-fit {
+  font-size: 11px;
+  padding: 0 12px;
+  margin-left: 6px;
+}
+.yard-viewport {
+  margin: 0 14px;
+  overflow: hidden;
+  border: 1px solid #2d3945;
+  border-radius: 8px;
+  background: #111820;
+  background-image: radial-gradient(#293340 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.yard-plan {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1248 / 900;
+  user-select: none;
+  touch-action: pan-y;
+}
+.yard-plan:has(.yard-car:focus-visible) {
+  outline: none;
+}
+.yard-perimeter {
+  fill: #17212a;
+  stroke: #4a5864;
+  stroke-width: 2;
+}
+.yard-road-layer {
+  fill: none;
+}
+.yard-road-center {
+  stroke: #78828d;
+  stroke-width: 1.1;
+  stroke-dasharray: 9 11;
+  opacity: .7;
+}
+.yard-parking-block {
+  fill: #192a29;
+  stroke: #36554c;
+  stroke-width: 1;
+}
+.yard-lot-title {
+  fill: #e4ecec;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.yard-lot-count {
+  fill: #68db9d;
+  font-size: 12px;
+  font-weight: 550;
+}
+.yard-car {
+  color: #4fd38a;
+  cursor: pointer;
+}
+.yard-bay {
+  fill: transparent;
+  stroke: #598373;
+  stroke-width: .7;
+  stroke-dasharray: 3 2;
+}
+.yard-car:hover .yard-bay, .yard-car:focus-visible .yard-bay {
+  fill: #ffffff12;
+  stroke: #effff7;
+  stroke-dasharray: none;
+  stroke-width: 1.5;
+}
+.yard-car:focus-visible {
+  outline: none;
+}
+.yard-car[aria-pressed='true'] {
+  color: var(--yellow);
+}
+.yard-car[aria-pressed='true'] .yard-bay {
+  fill: #ffc92818;
+  stroke: var(--yellow);
+  stroke-dasharray: none;
+  stroke-width: 1.8;
+}
+.yard-coordinate {
+  fill: #90b5a6;
+  font-size: 9px;
+  font-family: ui-monospace, monospace;
+}
+.yard-car[aria-pressed='true'] .yard-coordinate {
+  fill: #ffe38a;
+}
+.yard-gate-label {
+  fill: #111c23;
+  stroke: #4d7062;
+}
+.yard-gate text {
+  fill: #5ee7a2;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.yard-gate.exit text {
+  fill: var(--yellow);
+}
+.yard-gate.exit .yard-gate-label {
+  stroke: #8a783b;
+}
+.yard-street-caption {
+  fill: #758698;
+  font-size: 11px;
+  letter-spacing: 4px;
+}
+.yard-board-footer {
+  padding: 15px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.yard-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.yard-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.yard-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.road-key {
+  background: #566371;
+}
+.yard-inspection {
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px 24px;
+  min-height: 80px;
+  background: #ffffff02;
+}
+.inspection-icon {
+  color: var(--yellow);
+  border: 1px solid #76662f;
+  background: #ffc9280c;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+}
+.yard-inspection strong {
+  font-size: 13px;
+}
+.yard-inspection p {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 4px 0 0;
+}
+#yard-clear {
+  margin-left: auto;
+}
+@media (max-width: 720px) {
+  .yard-board-heading {
+    flex-wrap: wrap;
+    padding: 18px 14px;
+  }
+  .yard-viewport {
+    margin: 0 8px;
+  }
+  .yard-plan {
+    height: 510px;
+    aspect-ratio: auto;
+  }
+  .yard-board-footer, .yard-inspection {
+    padding: 14px;
+  }
+  .yard-legend {
+    gap: 12px;
+  }
+}

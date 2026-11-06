@@ -28,12 +28,15 @@ class UIHTTPTests(unittest.TestCase):
         return result
 
     def test_ui_and_every_referenced_asset_are_local_and_available(self):
-        paths = ['/ui', '/ui/', '/ui/app.js', '/ui/styles.css', '/ui/map.js',
+        paths = ['/ui', '/ui/', '/ui/app.js', '/ui/styles.css', '/ui/yard-geometry.js',
                  '/ui/icons.js', '/ui/state.js', '/ui/data.js', '/ui/yard-layout.js', '/ui/vehicle-list.js', '/ui/favicon.svg',
                  '/vendor/leaflet/leaflet.js', '/vendor/leaflet/leaflet.css']
         page = self.get('/ui/')[2].decode()
         self.assertNotIn('vehicle-list-panel', page)
         self.assertNotIn('vehicle-list-body', page)
+        self.assertNotIn('id="map"', page)
+        self.assertNotIn('type="search"', page)
+        self.assertNotIn('Mapa del patio', page)
         status, _, body = self.get('/ui/data/patio.json')
         self.assertEqual(status, 200)
         data = json.loads(body)

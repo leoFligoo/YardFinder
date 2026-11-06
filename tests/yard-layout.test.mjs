@@ -31,3 +31,41 @@ test('invalid layout dimensions are rejected', () => {
     assert.throws(()=>generateYard({lotCount:6,columns,rows:5}), /dimensiones/);
   }
 });
+
+test('street network connects both gates and every pickup stop without crossing parked cars', async () => {
+  const {buildYardGeometry} = await import('../web/yard-geometry.js');
+  const plan = buildYardGeometry(generateYard());
+  assert.equal(plan.positions.length, 120);
+  assert.equal(plan.roads.filter(r => r.id.startsWith('vertical')).length, 9);
+  const nodes = new Map(plan.nodes.map(n => [n.id, n]));
+  assert.equal(nodes.size, plan.nodes.length);
+  const adjacency = new Map(plan.nodes.map(n => [n.id, []]));
+  for (const edge of plan.edges) {
+    const a = nodes.get(edge.from), b = nodes.get(edge.to);
+    assert.ok(a && b);
+    assert.ok(a.x === b.x || a.y === b.y, 'Street segment must be axis-aligned');
+    assert.ok(edge.cost > 0);
+    adjacency.get(a.id).push(b.id);
+    if (edge.bidirectional) adjacency.get(b.id).push(a.id);
+  }
+  const reached = new Set([plan.entryNodeId]);
+  const queue = [plan.entryNodeId];
+  while (queue.length) for (const next of adjacency.get(queue.shift())) {
+    if (!reached.has(next)) {reached.add(next); queue.push(next);}
+  }
+  assert.ok(reached.has(plan.exitNodeId));
+  for (const p of plan.positions) {
+    assert.ok(p.width > p.height, 'Cars must be horizontal');
+    assert.ok(reached.has(p.accessNodeId), `${p.id} must be reachable from the entry`);
+    assert.equal(nodes.get(p.accessNodeId).y, p.cy);
+    for (const road of plan.roads) {
+      const left = Math.min(road.x1, road.x2) - road.width / 2;
+      const right = Math.max(road.x1, road.x2) + road.width / 2;
+      const top = Math.min(road.y1, road.y2) - road.width / 2;
+      const bottom = Math.max(road.y1, road.y2) + road.width / 2;
+      const overlaps = p.cx + p.width/2 > left && p.cx - p.width/2 < right
+        && p.cy + p.height/2 > top && p.cy - p.height/2 < bottom;
+      assert.equal(overlaps, false, `${p.id} overlaps street ${road.id}`);
+    }
+  }
+});
