@@ -60,10 +60,22 @@ or point nginx's `yard_app` upstream at a new service. The release already ships
   `X-Origin-Verify` (a random 40-char secret in Secrets Manager that only this distribution adds).
   The prefix list alone admits *any* CloudFront distribution; the header closes that.
 - No SSH, no inbound ports besides 80. Shell access is SSM only. IMDSv2 required, volumes encrypted.
-- The instance role is least-privilege: read `releases/*`, put-only `db-backups/*`, read the one secret.
+- The instance role is least-privilege: read `releases/*`, put-only `db-backups/*`, read the two secrets (origin header + Anthropic API key).
 - S3 bucket: private, encrypted, TLS-only. CloudFront adds HSTS, nosniff, frame and referrer headers.
 - Rotating the secret: change it in Secrets Manager, `cdk deploy` (updates CloudFront), then
   `./scripts/deploy.sh` (updates nginx). Requests fail with 403 between the two steps.
+
+## Anthropic API key
+
+CDK creates the Secrets Manager secret `yard-finder/anthropic-api-key` (with a throwaway value) and lets
+the instance role read it. Set the real key once, after `cdk deploy`:
+
+```bash
+aws secretsmanager put-secret-value --secret-id yard-finder/anthropic-api-key --secret-string 'sk-ant-...'
+```
+
+The app reads it at runtime with `aws secretsmanager get-secret-value` (or boto3). Not yet wired into
+`yard.env`/the service.
 
 ## Known gaps (MVP)
 
