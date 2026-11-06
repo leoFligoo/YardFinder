@@ -232,6 +232,17 @@ class Manejador(BaseHTTPRequestHandler):
         ruta = unquote(urlparse(self.path).path)
         if ruta == "/":
             return self._archivo(BASE / "interfaz.html")
+        if ruta in {"/ui", "/ui/"}:
+            return self._archivo(BASE / "web" / "index.html")
+        # Montajes acotados: nunca servir la raíz del proyecto ni listar directorios.
+        for prefijo, carpeta in (("/ui/", "web"), ("/vendor/", "vendor"),
+                                 ("/demo-assets/", "ejemplo_resultado")):
+            if ruta.startswith(prefijo):
+                raiz = (BASE / carpeta).resolve()
+                destino = (raiz / ruta[len(prefijo):]).resolve()
+                if destino.is_relative_to(raiz) and destino.is_file():
+                    return self._archivo(destino)
+                return self.send_error(404)
         if ruta == "/api/config":
             return self._json(leer_config())
         if ruta == "/api/videos":

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Yard Finder: vista local del patio sobre imágenes cenitales del dron.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Patio · Yard Finder</title>
+  <link rel="icon" href="/ui/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/ui/styles.css">
+  <script defer src="/vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="/ui/app.js"></script>
+</head>
+<body>
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
+  <aside class="sidebar">
+    <a class="brand" href="#/patio" aria-label="Yard Finder, inicio"><span data-icon="pin"></span><span>YARD FINDER<small>CONTROL DE PATIO</small></span></a>
+    <span class="nav-label">OPERACIÓN</span>
+    <nav aria-label="Navegación principal">
+      <a class="nav-item active" href="#/patio" aria-current="page"><span data-icon="layers"></span>Patio<span class="active-dot"></span></a>
+      <button class="nav-item" data-pending="Inventario"><span data-icon="car"></span>Inventario</button>
+      <button class="nav-item" data-pending="Despacho"><span data-icon="truck"></span>Despacho</button>
+      <button class="nav-item" data-pending="Pasadas"><span data-icon="drone"></span>Pasadas</button>
+      <button class="nav-item" data-pending="Excepciones"><span data-icon="alert"></span>Excepciones</button>
+      <button class="nav-item" data-pending="Reportes"><span data-icon="chart"></span>Reportes</button>
+    </nav>
+    <div class="local-status"><span data-icon="laptop"></span><div>Modo local<small><i></i> Recursos en este equipo</small></div></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="breadcrumb">Patio <span>›</span> <strong>Vista general</strong></div><span class="demo-badge">DEMO <span>· Ejemplo local</span></span><span class="topbar-status"><i></i> Sin conexión externa</span></header>
+    <main id="contenido" tabindex="-1">
+      <section class="page-heading"><div><div class="eyebrow">TU OPERACIÓN, A LA VISTA</div><h1>Vista general del patio</h1><p>Localizá cada vehículo sobre la imagen del dron.</p></div><div class="heading-action"><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button><small>Hasta 8 autos por camión</small></div></section>
+      <div id="load-state" class="load-state" role="status">Cargando el ejemplo local…</div>
+      <div id="patio-content" hidden>
+        <section class="stats" aria-label="Resumen del inventario">
+          <article class="stat"><div class="stat-icon" data-icon="car"></div><div><strong id="total-count">—</strong><span>Vehículos detectados</span></div><span class="stat-tag">TOTAL</span></article>
+          <article class="stat"><div class="stat-icon green" data-icon="check"></div><div><strong id="located-count">—</strong><span>Con ubicación</span></div><span class="stat-dot green-bg"></span></article>
+          <article class="stat"><div class="stat-icon red" data-icon="alert"></div><div><strong id="missing-count">—</strong><span>Sin ubicación</span></div></article>
+          <article class="stat"><div class="stat-icon" data-icon="layers"></div><div><strong id="sector-count">—</strong><span>Sectores definidos</span></div></article>
+        </section>
+        <div class="patio-layout">
+          <section class="panel map-panel" aria-label="Vista cenital del patio">
+            <div class="map-heading"><div><h2>Mapa del patio</h2><span class="muted">Imagen cenital · Ejemplo precalculado</span></div><span class="live-label"><i></i> Local</span></div>
+            <div class="map-toolbar"><label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Buscar VIN, tag o ID…" aria-label="Buscar VIN, tag o ID" autocomplete="off"><kbd>/</kbd></label><label class="sr-only" for="sector-filter">Filtrar por sector</label><select id="sector-filter"><option value="">Todos los sectores</option></select><button id="reset" class="icon-button" title="Restablecer vista y filtros" aria-label="Restablecer vista y filtros"><span data-icon="reset"></span></button></div>
+            <div class="map-wrap"><div id="map" aria-label="Mapa interactivo de vehículos" tabindex="0"></div><div class="north" aria-hidden="true">N<span>↑</span></div><div id="map-message" class="map-message" role="status" hidden></div><div class="layer-controls"><label><input id="show-sectors" type="checkbox" checked> Sectores</label><label><input id="show-vehicles" type="checkbox" checked> Autos</label></div></div>
+            <div class="map-footer"><span id="result-count" role="status"></span><div class="legend"><span><i class="green-bg"></i> En sector</span><span><i class="yellow-bg"></i> Fuera de sector</span><span><i class="selected-dot"></i> Seleccionado</span></div></div>
+            <div id="search-results" class="search-results" aria-label="Resultados de búsqueda" hidden></div>
+          </section>
+          <aside class="context-column" aria-label="Información del patio">
+            <section id="vehicle-card" class="panel vehicle-card" hidden aria-label="Vehículo seleccionado"><div class="card-heading"><h2 id="vehicle-title">Vehículo</h2><button id="close-selection" class="icon-button" aria-label="Cerrar selección">×</button></div><img id="vehicle-photo" alt="Recorte del vehículo seleccionado"><p id="vehicle-image-error" class="muted" hidden>Recorte no disponible.</p><dl id="vehicle-info"></dl><p class="small-note">Observación del ejemplo local. Los campos sin datos no fueron identificados.</p></section>
+            <section class="panel flight-card"><h2>Última pasada disponible</h2><div class="drone-line"><span class="drone-icon" data-icon="drone"></span><div><strong>Ejemplo local</strong><span id="flight-date" class="muted"></span></div></div><dl class="flight-info"><div><dt>Imágenes cenitales</dt><dd id="image-count">—</dd></div><div><dt>Detecciones con tag</dt><dd id="tag-count">—</dd></div></dl><div class="source-note"><span data-icon="info"></span><span>Dron del proyecto: <strong>DJI Air 3S</strong>. Este ejemplo no es una pasada en vivo.</span></div><a class="button outline" id="original-map" href="/salida/demo_local/mapa.html" target="_blank" rel="noopener"><span data-icon="external"></span>Abrir mapa de resultados</a></section>
+            <section class="panel attention-card"><div class="card-heading"><h2>Atención requerida</h2><span data-icon="alert" class="yellow"></span></div><div class="attention-row"><span data-icon="pin"></span><span><strong id="attention-missing">—</strong> sin ubicación</span></div><div class="attention-row"><span data-icon="car"></span><span><strong id="outside-count">—</strong> fuera de sector</span></div><p class="small-note">Un auto puede tener coordenadas y estar fuera de los sectores definidos.</p><button id="review-outside" class="button secondary">Ver autos fuera de sector<span data-icon="arrow"></span></button></section>
+            <div class="map-help"><span data-icon="info"></span><p>Seleccioná un auto para ver su observación. Usá + / − para acercarte al patio.</p></div>
+          </aside>
+        </div>
+        <footer class="page-footer"><span data-icon="database"></span><span>Fuente: ejemplo precalculado del repositorio · No conectado al inventario en vivo</span><span class="version">UI 01 / PATIO</span></footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="pending-dialog" aria-labelledby="pending-title"><span class="dialog-icon" data-icon="layers"></span><h2 id="pending-title">Próxima pantalla</h2><p id="pending-description"></p><button id="close-dialog" class="button primary">Volver al patio</button></dialog>
+</body>
+</html>
