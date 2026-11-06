@@ -17,7 +17,7 @@
     <span class="nav-label">OPERACIÓN</span>
     <nav aria-label="Navegación principal">
       <a class="nav-item active" href="#/patio" aria-current="page"><span data-icon="layers"></span>Patio<span class="active-dot"></span></a>
-      <button class="nav-item" data-pending="Inventario"><span data-icon="car"></span>Inventario</button>
+      <a class="nav-item" href="#/inventario"><span data-icon="car"></span>Inventario</a>
       <button class="nav-item" data-pending="Despacho"><span data-icon="truck"></span>Despacho</button>
       <button class="nav-item" data-pending="Pasadas"><span data-icon="drone"></span>Pasadas</button>
       <button class="nav-item" data-pending="Excepciones"><span data-icon="alert"></span>Excepciones</button>
@@ -27,9 +27,11 @@
   </aside>
   <div class="workspace">
     <main id="contenido" tabindex="-1">
-      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="heading-action"><button id="refresh-patio" class="button outline" type="button">Actualizar patio</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button></div></section>
+      <div id="patio-page">
+      <p id="patio-route-message" class="route-message" role="status" hidden></p>
+      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="page-actions"><button id="refresh-patio" class="button outline" type="button"><span data-icon="reset"></span>Actualizar</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Abrir Chat<span class="soon">Próximamente</span></button></div></section>
       <section class="stats" aria-label="Resumen de la distribución">
-        <article class="stat"><div class="stat-icon green" data-icon="car"></div><div><strong id="available-count">—</strong><span>Autos ubicados</span></div></article>
+        <article class="stat"><div class="stat-icon green" data-icon="car"></div><div><strong id="available-count">—</strong><span>Autos observados</span><small class="muted">Incluye autos sin identificar</small></div></article>
         <article class="stat"><div class="stat-icon" data-icon="layers"></div><div><strong id="lot-count">—</strong><span>Lotes</span></div></article>
         <article class="stat"><div class="stat-icon" data-icon="car"></div><div><strong id="per-lot-count">—</strong><span>Posiciones por lote</span></div></article>
         <article class="stat"><div class="stat-icon" data-icon="arrow"></div><div><strong id="access-count">—</strong><span>Entrada y salida</span></div></article>
@@ -44,8 +46,57 @@
         </aside>
       </div>
       <footer class="page-footer"><span data-icon="info"></span><span>Consultar un auto no lo reserva para despacho.</span><span class="version">UI 01 / PATIO</span></footer>
+      </div>
+      <section id="inventory-page" aria-labelledby="inventory-title" hidden>
+        <header class="page-heading inventory-heading">
+          <div><h1 id="inventory-title">Inventario</h1><p id="inventory-subtitle">Consultando registros…</p></div>
+          <div class="page-actions"><button id="refresh-inventory" class="button outline" type="button"><span data-icon="reset"></span>Actualizar</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Abrir Chat<span class="soon">Próximamente</span></button></div>
+        </header>
+        <div class="inventory-metrics" aria-label="Resumen del inventario">
+          <article><span>Vehículos registrados</span><strong data-count="registrados">—</strong><small>En el catálogo</small></article>
+          <article><span>Registrados ubicados</span><strong class="green" data-count="ubicados">—</strong><small>Con observación en el último vuelo</small></article>
+          <article><span>Sin observación</span><strong data-count="sin_observacion">—</strong><small>Registrados sin ubicación actual</small></article>
+          <article><span>Sin identificar</span><strong class="yellow" data-count="sin_identificar">—</strong><small>Observaciones sin registro asociado</small></article>
+        </div>
+        <form id="inventory-filters" class="inventory-filters" role="search" aria-label="Buscar y filtrar inventario">
+          <label class="inventory-search"><span>Buscar</span><span class="search"><span data-icon="search"></span><input id="inventory-query" type="search" placeholder="VIN, AprilTag, modelo o ID" autocomplete="off"></span></label>
+          <label>Modelo<select id="inventory-modelo"><option value="">Todos los modelos</option></select></label>
+          <label>Color<select id="inventory-color"><option value="">Todos los colores</option></select></label>
+          <label>Lote<select id="inventory-lote"><option value="">Todos los lotes</option></select></label>
+          <label>Estado de ubicación<select id="inventory-estado"><option value="">Todos los estados</option><option value="ubicado">Ubicado</option><option value="sin_observacion">Sin observación</option></select></label>
+          <button id="inventory-clear" type="button" class="button inventory-clear"><span data-icon="reset"></span>Limpiar</button>
+        </form>
+        <div class="inventory-scopes" role="group" aria-label="Tipo de registros">
+          <button type="button" data-scope="registrados" aria-pressed="true">Registrados <span data-count="registrados">—</span></button>
+          <button type="button" data-scope="sin_identificar" aria-pressed="false">Observaciones sin identificar <span data-count="sin_identificar">—</span></button>
+        </div>
+        <div class="inventory-context"><p id="inventory-scope-note">Los vehículos registrados incluyen aquellos sin observación en el último vuelo.</p><span id="inventory-results-count" role="status" aria-live="polite"></span></div>
+        <p class="inventory-scroll-hint">Deslizá la tabla para ver todas las columnas y consultar la posición.</p>
+        <div id="inventory-state" class="inventory-state" role="status" hidden><h2 id="inventory-state-title"></h2><p id="inventory-state-description"></p><button id="inventory-retry" type="button" class="button outline" hidden>Reintentar</button><button id="inventory-empty-clear" type="button" class="button outline" hidden>Limpiar filtros</button></div>
+        <div id="inventory-table-wrap" class="inventory-table-wrap" role="region" aria-label="Tabla de inventario, desplazable horizontalmente" tabindex="0" hidden>
+          <table class="inventory-table">
+            <caption class="sr-only">Vehículos y última ubicación observada. Consultar no reserva para despacho.</caption>
+            <thead><tr>
+              <th scope="col" aria-sort="ascending"><button type="button" data-sort="modelo">Vehículo <span aria-hidden="true">↑</span></button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="vin">VIN <span aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="tag">AprilTag <span aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="lote">Lote / X, Y <span aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="estado">Ubicación <span aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-sort="ultima_observacion">Última observación <span aria-hidden="true">↕</span></button></th>
+              <th scope="col"><span class="sr-only">Consulta</span></th>
+            </tr></thead><tbody id="inventory-body"></tbody>
+          </table>
+        </div>
+        <footer id="inventory-pagination" class="inventory-pagination" hidden>
+          <label>Filas por página <select id="inventory-page-size"><option>10</option><option>25</option><option>50</option></select></label>
+          <span id="inventory-range"></span>
+          <div><button id="inventory-prev" class="icon-button" aria-label="Página anterior">‹</button><span id="inventory-page-number"></span><button id="inventory-next" class="icon-button" aria-label="Página siguiente">›</button></div>
+        </footer>
+        <div class="inventory-footnote"><span data-icon="info"></span><p id="inventory-flight-note">Las ubicaciones corresponden al último vuelo registrado.</p></div>
+        <p class="inventory-disclaimer">Inventario de prueba con AprilTags ficticios. La ubicación no indica disponibilidad. La selección para despacho se habilitará después de una búsqueda en el chat.</p>
+      </section>
     </main>
   </div>
-  <dialog id="pending-dialog" aria-labelledby="pending-title"><span class="dialog-icon" data-icon="layers"></span><h2 id="pending-title">Próxima pantalla</h2><p id="pending-description"></p><button id="close-dialog" class="button primary">Volver al patio</button></dialog>
+  <dialog id="pending-dialog" aria-labelledby="pending-title"><span class="dialog-icon" data-icon="layers"></span><h2 id="pending-title">Próxima pantalla</h2><p id="pending-description"></p><button id="close-dialog" class="button primary">Entendido</button></dialog>
 </body>
 </html>

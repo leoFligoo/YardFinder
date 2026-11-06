@@ -2,7 +2,7 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
-from inventario_ui import InventarioError, leer_patio, resolver_recorte
+from inventario_ui import InventarioError, leer_patio, leer_inventario, resolver_recorte
 
 
 class InventoryTests(unittest.TestCase):
@@ -57,6 +57,58 @@ class InventoryTests(unittest.TestCase):
         with self.assertRaises(InventarioError):
             leer_patio(self.base)
         self.assertFalse(self.db.exists())
+
+    def test_registry_includes_unobserved_and_unidentified_without_double_counting(self):
+        with sqlite3.connect(self.db) as con:
+            con.execute("INSERT INTO vehiculos VALUES(0,'VIN-0','Modelo sin vuelo','Negro')")
+            con.execute('INSERT INTO autos VALUES(1,999,1,1,1,0,.9,NULL)')
+        before = self.db.read_bytes()
+        data = leer_inventario(self.base)
+        self.assertEqual(data['conteos'], dict(registrados=2, ubicados=1, sin_observacion=1,
+                                             sin_identificar=1, observaciones=2))
+        rows = {row['clave']: row for row in data['filas']}
+        self.assertEqual(rows['vehiculo:261']['id'], 62)
+        self.assertEqual(rows['vehiculo:261']['ultima_observacion'], '2026-02-01')
+        self.assertEqual(rows['vehiculo:0']['estado'], 'sin_observacion')
+        self.assertIsNone(rows['vehiculo:0']['posicion'])
+        self.assertIsNone(rows['vehiculo:0']['ultima_observacion'])
+        self.assertFalse(rows['observacion:2:124']['registrado'])
+        self.assertEqual(rows['observacion:2:124']['estado'], 'ubicado')
+        self.assertEqual(before, self.db.read_bytes())
+
+    def test_registry_without_flight_or_with_empty_latest_keeps_catalog(self):
+        with sqlite3.connect(self.db) as con:
+            con.execute("INSERT INTO vuelos VALUES(3,'empty','2026-02-01')")
+        data = leer_inventario(self.base)
+        self.assertEqual(data['vuelo']['id'], 3)  # tie breaks by ID
+        self.assertEqual(data['conteos']['sin_observacion'], 1)
+        self.assertEqual(data['conteos']['observaciones'], 0)
+        with sqlite3.connect(self.db) as con:
+            con.execute('DELETE FROM vuelos')
+        data = leer_inventario(self.base)
+        self.assertIsNone(data['vuelo'])
+        self.assertIsNone(data['filas'][0]['ultima_observacion'])
+        with sqlite3.connect(self.db) as con:
+            con.execute('DELETE FROM vehiculos')
+        self.assertEqual(leer_inventario(self.base)['filas'], [])
+
+    def test_unknown_tag_is_an_unmatched_observation_and_repeated_tag_is_error(self):
+        with sqlite3.connect(self.db) as con:
+            con.execute('UPDATE autos SET tag=900 WHERE vuelo_id=2 AND auto_id=124')
+        data = leer_inventario(self.base)
+        self.assertEqual(data['conteos']['sin_identificar'], 1)
+        self.assertEqual(data['filas'][0]['tag'], 900)
+        with sqlite3.connect(self.db) as con:
+            con.execute('UPDATE autos SET tag=261 WHERE vuelo_id=2 AND auto_id=124')
+        with self.assertRaisesRegex(InventarioError, 'AprilTag'):
+            leer_inventario(self.base)
+
+    def test_bundled_registry_counts_and_real_position(self):
+        data = leer_inventario(Path(__file__).resolve().parent.parent)
+        self.assertEqual(data['conteos'], dict(registrados=124, ubicados=109, sin_observacion=15,
+                                             sin_identificar=11, observaciones=120))
+        row = next(row for row in data['filas'] if row['id'] == 124)
+        self.assertEqual(row['posicion'], dict(loteId=5, x=2, y=3))
 
     def test_foreign_crop_path_resolves_locally_and_blocks_escapes(self):
         crop = self.base/'salida/vuelo_new/recortes/auto_0062.jpg'

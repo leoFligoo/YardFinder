@@ -25,9 +25,13 @@ class PublicPreviewTests(unittest.TestCase):
             for auto in json.loads(body)['autos']:
                 self.assertEqual(request(auto['recorte'])[0],200)
             self.assertEqual(request('/ui/')[0],200)
-            for path in ['/api/config','/api/procesar','/inventario.db','/api/patio/recortes/../inventario.db','/ui/../inventario.db']:
+            status, body = request('/api/inventario')
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(body)['conteos']['registrados'], 124)
+            for path in ['/api/config','/api/procesar','/inventario.db','/api/inventario/../config','/api/patio/recortes/../inventario.db','/ui/../inventario.db']:
                 self.assertEqual(request(path)[0],404)
             self.assertEqual(request('/api/procesar','POST')[0],405)
+            self.assertEqual(request('/api/inventario','POST')[0],405)
         finally:
             server.shutdown()
             server.server_close()
