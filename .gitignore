@@ -1,5 +1,31 @@
+# ---- Dependencias (módulos que NO van a git) ----
+node_modules/
+**/node_modules/
+jspm_packages/
+
+# ---- Python ----
 .venv/
+venv/
+env/
 .cache/
 __pycache__/
 *.py[cod]
+*.egg-info/
+
+# ---- Certificados / claves de la demo (secretos, no subir) ----
+PWA/cert.pem
+PWA/key.pem
+PWA/_openssl_min.cnf
+*.pem
+*.key
+.env
+*.env
+
+# ---- Sistema operativo / editor ----
 .DS_Store
+Thumbs.db
+.idea/
+
+# ---- Logs y temporales ----
+*.log
+npm-debug.log*
