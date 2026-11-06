@@ -28,9 +28,8 @@
     <div class="local-status"><span data-icon="laptop"></span><div>Modo local<small><i></i> Recursos en este equipo</small></div></div>
   </aside>
   <div class="workspace">
-    <header class="topbar"><div class="breadcrumb">Patio <span>›</span> <strong>Vista general</strong></div><span class="demo-badge">DEMO <span>· Ejemplo local</span></span><span class="topbar-status"><i></i> Sin conexión externa</span></header>
     <main id="contenido" tabindex="-1">
-      <section class="page-heading"><div><div class="eyebrow">TU OPERACIÓN, A LA VISTA</div><h1>Vista general del patio</h1><p>Localizá cada vehículo sobre la imagen del dron.</p></div><div class="heading-action"><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button><small>Hasta 8 autos por camión</small></div></section>
+      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="heading-action"><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button></div></section>
       <section id="yard-layout" aria-label="Distribución configurada del patio"></section>
       <div id="load-state" class="load-state" role="status">Cargando el ejemplo local…</div>
       <div id="patio-content" hidden>
@@ -42,7 +41,7 @@
         </section>
         <div class="patio-layout">
           <section class="panel map-panel" aria-label="Vista cenital del patio">
-            <div class="map-heading"><div><h2>Mapa del patio</h2><span class="muted">Imagen cenital · Ejemplo precalculado</span></div><span class="live-label"><i></i> Local</span></div>
+            <div class="map-heading"><div><h2>Mapa del patio</h2><span class="muted">Imagen cenital · Ejemplo precalculado</span></div></div>
             <div class="map-toolbar"><label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Buscar VIN, tag o ID…" aria-label="Buscar VIN, tag o ID" autocomplete="off"><kbd>/</kbd></label><label class="sr-only" for="sector-filter">Filtrar por sector</label><select id="sector-filter"><option value="">Todos los sectores</option></select><button id="reset" class="icon-button" title="Restablecer vista y filtros" aria-label="Restablecer vista y filtros"><span data-icon="reset"></span></button></div>
             <div class="map-wrap"><div id="map" aria-label="Mapa interactivo de vehículos" tabindex="0"></div><div class="north" aria-hidden="true">N<span>↑</span></div><div id="map-message" class="map-message" role="status" hidden></div><div class="layer-controls"><label><input id="show-sectors" type="checkbox" checked> Sectores</label><label><input id="show-vehicles" type="checkbox" checked> Autos</label></div></div>
             <div class="map-footer"><span id="result-count" role="status"></span><div class="legend"><span><i class="green-bg"></i> En sector</span><span><i class="yellow-bg"></i> Fuera de sector</span><span><i class="selected-dot"></i> En consulta</span></div></div>

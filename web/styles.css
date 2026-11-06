@@ -1606,3 +1606,15 @@ dialog p {
     flex-basis: 100%;
   }
 }
+
+/* Leave room for both the sector name and the inset dropdown arrow. */
+#sector-filter {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 160px;
+  padding: 10px 36px 10px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cad2de' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 12px;
+}
