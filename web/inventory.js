@@ -5,7 +5,8 @@ import {renderIcons} from './icons.js';
 export function createInventory() {
   const $ = id => document.getElementById(`inventory-${id}`);
   const root = $('page');
-  let data = null, filters = {...DEFAULT_FILTERS}, request = 0, loaded = false;
+  const fields = ['query', 'modelo', 'color', 'lote', 'estado'];
+  let data = null, filters = {...DEFAULT_FILTERS}, loading = false;
   const node = (tag, text, className) => {
     const el = document.createElement(tag);
     if (text != null) el.textContent = text;
@@ -84,7 +85,7 @@ export function createInventory() {
     $('next').disabled = result.page === result.pages;
   }
   function syncControls() {
-    for (const field of ['query', 'modelo', 'color', 'lote', 'estado']) $(field).value = filters[field];
+    for (const field of fields) $(field).value = filters[field];
     $('page-size').value = filters.pageSize;
   }
   function clear() {
@@ -92,7 +93,8 @@ export function createInventory() {
     syncControls(); render();
   }
   async function refresh() {
-    const current = ++request;
+    if (loading) return;
+    loading = true;
     data = null;
     root.setAttribute('aria-busy', 'true');
     root.querySelectorAll('input, select, [data-scope], #inventory-clear').forEach(el => {el.disabled = true;});
@@ -102,42 +104,37 @@ export function createInventory() {
     $('flight-note').textContent = 'Las ubicaciones corresponden al último vuelo registrado.';
     state('Cargando inventario…', 'Consultando el catálogo y las observaciones del último vuelo.');
     try {
-      const response = await loadRegistry();
-      if (current !== request) return;
-      data = response; loaded = true;
+      data = await loadRegistry();
       root.querySelectorAll('[data-count]').forEach(el => {el.textContent = data.conteos[el.dataset.count];});
       $('subtitle').textContent = `${data.conteos.registrados} vehículos registrados`;
       $('flight-note').textContent = data.vuelo
         ? `Último vuelo: ${data.vuelo.nombre} · ${observationDate(data.vuelo.fecha)} · ${data.conteos.observaciones} observaciones. La fecha es común a todo el vuelo.`
         : 'No hay vuelos registrados. Los vehículos del catálogo aún no tienen observación.';
       for (const field of ['modelo', 'color', 'lote']) {
-        const labels = {modelo: 'Todos los modelos', color: 'Todos los colores', lote: 'Todos los lotes'};
-        const options = [new Option(labels[field], ''), ...inventoryOptions(data.filas, field).map(value => new Option(field === 'lote' ? `Lote ${value}` : value, value)),
+        const options = [$(field).options[0], ...inventoryOptions(data.filas, field).map(value => new Option(field === 'lote' ? `Lote ${value}` : value, value)),
           new Option(field === 'lote' ? 'Sin ubicación' : 'Sin datos', '__missing')];
         $(field).replaceChildren(...options);
         if (!options.some(option => option.value === filters[field])) filters[field] = '';
       }
       syncControls(); render();
     } catch (error) {
-      if (current !== request) return;
-      loaded = false;
+      data = null;
       $('subtitle').textContent = 'Inventario no disponible';
       state('No se pudo cargar el inventario', error.message, {retry: true});
     } finally {
-      if (current === request) {
-        root.setAttribute('aria-busy', 'false');
-        root.querySelectorAll('input, select, [data-scope], #inventory-clear').forEach(el => {el.disabled = !data;});
-      }
+      loading = false;
+      root.setAttribute('aria-busy', 'false');
+      root.querySelectorAll('input, select, [data-scope], #inventory-clear').forEach(el => {el.disabled = !data;});
     }
   }
   $('filters').addEventListener('submit', event => event.preventDefault());
-  for (const field of ['query', 'modelo', 'color', 'lote', 'estado']) {
+  for (const field of fields) {
     $(field).addEventListener(field === 'query' ? 'input' : 'change', () => {
       filters[field] = $(field).value; filters.page = 1; render();
     });
   }
   root.querySelectorAll('[data-scope]').forEach(button => button.addEventListener('click', () => {
-    filters = {...DEFAULT_FILTERS, scope: button.dataset.scope}; syncControls(); render();
+    filters.scope = button.dataset.scope; clear();
   }));
   root.querySelectorAll('[data-sort]').forEach(button => button.addEventListener('click', () => {
     const key = button.dataset.sort;
@@ -150,5 +147,5 @@ export function createInventory() {
   $('empty-clear').addEventListener('click', clear);
   $('retry').addEventListener('click', refresh);
   document.getElementById('refresh-inventory').addEventListener('click', refresh);
-  return {show: () => {if (!loaded && !data) refresh();}};
+  return {show: () => {if (!data) refresh();}};
 }

@@ -83,45 +83,31 @@ Ver [LEEME.md](LEEME.md) para configuración, procesamiento de fotos/video y com
 
 ### UI 02 · Inventario
 
-Abrir **http://127.0.0.1:8765/ui/#/inventario**. La barra lateral navega entre Patio e Inventario.
-Consulta **`GET /api/inventario`**, en una transacción SQLite de solo lectura, sin cambiar ni seedear
-`inventario.db`. Usa el último vuelo por `fecha DESC, id DESC` y conserva el catálogo completo.
+Abrir **http://127.0.0.1:8765/ui/#/inventario**. `GET /api/inventario` lee el catálogo completo
+junto al último vuelo (`fecha DESC, id DESC`) en una única transacción SQLite de solo lectura.
 
-Los conteos se distinguen explícitamente (valores del inventario de prueba incluido):
-
-| Conteo | Definición | Valor |
+| Conteo (inventario de prueba) | Definición | Valor |
 |---|---|---:|
 | Registrados | Filas en `vehiculos` | 124 |
-| Registrados ubicados | Registros con observación por tag en el último vuelo | 109 |
-| Sin observación | Registros sin observación en ese vuelo, aunque pudieran tener una histórica | 15 |
-| Sin identificar | Observaciones del último vuelo sin registro asociado, incluido tag ausente o desconocido | 11 |
+| Registrados ubicados | Con observación por tag en el último vuelo | 109 |
+| Sin observación | Registrados sin observación en ese vuelo | 15 |
+| Sin identificar | Observaciones sin registro asociado, incluido tag ausente o desconocido | 11 |
 | Observaciones | Detecciones del último vuelo: 109 vinculadas + 11 sin identificar | 120 |
 
-La vista inicial **Registrados** contiene 124 filas, incluyendo las 15 sin ubicación. La vista
-**Observaciones sin identificar** contiene las otras 11 detecciones. No se afirma que haya 135 autos
-identificados ni se agregan los 15 sin observación al plano. La pertenencia al catálogo se determina
-por el vínculo de tag, no por tener un VIN/modelo completo. Un tag repetido dentro del último vuelo
-produce un error explícito para no atribuir dos ubicaciones al mismo registro.
+La vista **Registrados** incluye los 15 sin ubicación. **Observaciones sin identificar** muestra
+las otras 11 detecciones; no las suma al catálogo ni agrega los 15 sin observación al plano.
+Los tags repetidos producen un error explícito. La fecha mostrada es común al vuelo, con soporte EXIF.
 
-- Búsqueda por VIN, AprilTag, modelo, color o ID de observación; ignora mayúsculas y acentos.
-- Filtros combinables por modelo, color, lote y estado de ubicación; **Limpiar** restaura los filtros
-  y orden dentro de la vista actual. Cambiar de vista limpia filtros para evitar coincidencias ocultas.
-- Orden por vehículo, VIN, AprilTag, lote, estado o última observación; datos ausentes al final.
-  Paginación de 10, 25 o 50 filas. Búsqueda, filtros y orden restablecen la primera página.
-- **Actualizar** vuelve a consultar SQLite conservando los filtros válidos. Los conteos superiores
-  corresponden al inventario completo; la cantidad de resultados y la paginación reflejan los filtros.
-- **Ver en patio** abre `#/patio?vuelo=<id>&auto=<id>` y enfoca su posición real lote/X/Y y ficha.
-  Si cambió el último vuelo, se informa que esa observación ya no está vigente, sin mostrar otra por error.
-- Última observación usa la fecha común del vuelo (incluye soporte para formato EXIF). Sin vínculo
-  actual se muestra **Sin observación**, sin reutilizar fechas antiguas ni fechas de ingreso.
-- Estados de carga, error con reintento, catálogo vacío y búsqueda sin coincidencias. En móvil la
-  tabla se desplaza horizontalmente para conservar VIN completo y todas las columnas.
-- No hay selección ni reserva desde Inventario. El chat continúa pendiente; no se simulan resultados.
-  La ubicación no implica disponibilidad, y no existe patente ni reserva en SQLite.
+- Búsqueda por VIN, tag, modelo, color o ID; filtros combinables, orden y páginas de 10/25/50 filas.
+- **Limpiar** y cambiar de vista restablecen filtros y orden; **Actualizar** conserva filtros válidos.
+  Los conteos superiores son globales; resultados y paginación reflejan los filtros.
+- **Ver en patio** abre la ficha por `vuelo + auto_id`, sin inferir posición desde el ID.
+  Si cambió el vuelo, muestra un aviso en lugar de consultar otra observación.
+- Carga, error/reintento, vacío y sin coincidencias; tabla desplazable en móvil.
+- Consulta sin reserva: el chat de esta UI sigue pendiente. Ubicación no implica disponibilidad.
 
-La vista pública de solo lectura en `8766` permite también el GET exacto `/api/inventario`;
-continúa bloqueando POST, APIs administrativas, rutas del sistema y descarga de la base.
-No requiere APIs externas, CDNs, dependencias nuevas ni compilación. `web/data/patio.json` no se consulta.
+La vista pública en `8766` habilita únicamente el GET exacto `/api/inventario` además de Patio;
+mantiene bloqueados POST, administración y la base. Sin dependencias nuevas ni cambios en SQLite.
 
 ## Estado del proyecto
 

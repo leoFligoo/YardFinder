@@ -1,4 +1,4 @@
-import {normalizeInventory} from './data.js';
+import {fetchInventory, normalizeInventory} from './data.js';
 
 const collator = new Intl.Collator('es', {numeric: true, sensitivity: 'base'});
 const fold = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es');
@@ -32,14 +32,7 @@ export function normalizeRegistry(raw) {
   return raw;
 }
 
-export async function loadRegistry() {
-  const response = await fetch('/api/inventario', {cache: 'no-store'});
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new Error(data.error || `No se pudo leer el inventario (HTTP ${response.status}).`);
-  }
-  return normalizeRegistry(await response.json());
-}
+export const loadRegistry = async () => normalizeRegistry(await fetchInventory('/api/inventario'));
 
 export function queryInventory(rows, options = {}) {
   const f = {...DEFAULT_FILTERS, ...options};

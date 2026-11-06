@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {DEFAULT_FILTERS, inventoryCounts, normalizeRegistry, queryInventory, inventoryOptions, observationDate, loadRegistry} from '../web/inventory-data.js';
 import {parseRoute, patioLink} from '../web/router.js';
+import {loadPatio} from '../web/data.js';
 
 const located = {clave:'vehiculo:261', registrado:true, id:62, vuelo_id:1, tag:261,
   modelo:'Fiat Cronos Drive', color:'Beige', vin:'VIN62', posicion:{loteId:1,x:4,y:5},
@@ -68,14 +69,20 @@ test('flight dates preserve calendar date and links use observation identity, ne
   assert.equal(parseRoute('#/patio?auto=invalid&vuelo=1').auto,null);
   assert.equal(parseRoute('#/unknown').page,'patio');
 });
-test('load failures are surfaced and requests only use the local read-only API', async () => {
+test('shared HTTP loader handles JSON and non-JSON errors for both local APIs', async () => {
   const previous = globalThis.fetch;
   try {
-    globalThis.fetch = async (url, options) => {
-      assert.equal(url,'/api/inventario'); assert.equal(options.cache,'no-store');
-      return {ok:false,status:503,json:async()=>({error:'SQLite no disponible'})};
-    };
-    await assert.rejects(loadRegistry,/SQLite no disponible/);
+    for (const [load, path] of [[loadRegistry,'/api/inventario'], [loadPatio,'/api/patio']]) {
+      globalThis.fetch = async (url, options) => {
+        assert.equal(url,path); assert.equal(options.cache,'no-store');
+        return {ok:false,status:503,json:async()=>({error:'SQLite no disponible'})};
+      };
+      await assert.rejects(load,/SQLite no disponible/);
+      globalThis.fetch = async () => ({ok:false,status:502,json:async()=>{throw new SyntaxError('HTML');}});
+      await assert.rejects(load,/HTTP 502/);
+    }
+    globalThis.fetch = async () => ({ok:true,json:async()=>({fuente:'sqlite',autos:[located]})});
+    assert.equal((await loadPatio()).autos[0].id,62);
     globalThis.fetch = async () => ({ok:true,json:async()=>({fuente:'sqlite',filas:rows,conteos:inventoryCounts(rows)})});
     assert.equal((await loadRegistry()).filas.length,3);
   } finally {globalThis.fetch = previous;}

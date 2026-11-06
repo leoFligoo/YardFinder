@@ -74,9 +74,12 @@ export function inventoryImageUrl(auto) {
   }
   return expected;
 }
-export async function loadPatio() {
-  const response = await fetch('/api/patio', {cache: 'no-store'});
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || `No se pudo leer el inventario (HTTP ${response.status}).`);
-  return normalizeInventory(data);
+export async function fetchInventory(path) {
+  const response = await fetch(path, {cache: 'no-store'});
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `No se pudo leer el inventario (HTTP ${response.status}).`);
+  }
+  return response.json();
 }
+export const loadPatio = async () => normalizeInventory(await fetchInventory('/api/patio'));
