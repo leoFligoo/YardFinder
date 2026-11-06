@@ -1,0 +1,9 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/yard.ts",
+  "profile": "fligoo-hackathon-admin",
+  "context": {
+    "cloudfrontPrefixListId": "pl-3b927c52",
+    "instanceType": "t3.small",
+    "@aws-cdk/core:newStyleStackSynthesis": true
+  }
+}

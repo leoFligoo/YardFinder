@@ -1,0 +1,9 @@
+[Unit]
+Description=Nightly inventario.db backup
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

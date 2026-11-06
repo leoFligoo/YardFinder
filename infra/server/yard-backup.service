@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up inventario.db to S3
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/yard/yard.env
+ExecStart=/usr/local/bin/yard-backup-db
