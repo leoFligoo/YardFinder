@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Yard Finder: distribución interactiva de seis lotes, autos y calles de circulación.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Patio · Yard Finder</title>
+  <link rel="icon" href="/ui/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/ui/styles.css">
+  <script type="module" src="/ui/app.js"></script>
+</head>
+<body>
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
+  <aside class="sidebar">
+    <a class="brand" href="#/patio" aria-label="Yard Finder, inicio"><span data-icon="pin"></span><span>YARD FINDER<small>CONTROL DE PATIO</small></span></a>
+    <span class="nav-label">OPERACIÓN</span>
+    <nav aria-label="Navegación principal">
+      <a class="nav-item active" href="#/patio" aria-current="page"><span data-icon="layers"></span>Patio<span class="active-dot"></span></a>
+      <button class="nav-item" data-pending="Inventario"><span data-icon="car"></span>Inventario</button>
+      <button class="nav-item" data-pending="Despacho"><span data-icon="truck"></span>Despacho</button>
+      <button class="nav-item" data-pending="Pasadas"><span data-icon="drone"></span>Pasadas</button>
+      <button class="nav-item" data-pending="Excepciones"><span data-icon="alert"></span>Excepciones</button>
+      <button class="nav-item" data-pending="Reportes"><span data-icon="chart"></span>Reportes</button>
+    </nav>
+    <div class="local-status"><span data-icon="laptop"></span><div>Modo local<small><i></i> Recursos en este equipo</small></div></div>
+  </aside>
+  <div class="workspace">
+    <main id="contenido" tabindex="-1">
+      <section class="page-heading"><div><h1>Vista general del patio</h1></div><div class="heading-action"><button id="refresh-patio" class="button outline" type="button">Actualizar patio</button><button class="button primary" data-pending="Despacho"><span data-icon="chat"></span>Planificar por chat<span class="soon">Próximamente</span></button></div></section>
+      <section class="stats" aria-label="Resumen de la distribución">
+        <article class="stat"><div class="stat-icon green" data-icon="car"></div><div><strong id="available-count">—</strong><span>Autos ubicados</span></div></article>
+        <article class="stat"><div class="stat-icon" data-icon="layers"></div><div><strong id="lot-count">—</strong><span>Lotes</span></div></article>
+        <article class="stat"><div class="stat-icon" data-icon="car"></div><div><strong id="per-lot-count">—</strong><span>Posiciones por lote</span></div></article>
+        <article class="stat"><div class="stat-icon" data-icon="arrow"></div><div><strong id="access-count">—</strong><span>Entrada y salida</span></div></article>
+      </section>
+      <div id="yard-and-detail" class="yard-and-detail">
+        <section id="yard-layout" aria-label="Distribución interactiva del patio"></section>
+        <aside id="vehicle-card" class="panel vehicle-card yard-vehicle-card" aria-labelledby="vehicle-title" hidden>
+          <div class="card-heading"><h2 id="vehicle-title">Auto</h2><button id="close-vehicle-detail" class="icon-button" aria-label="Cerrar ficha del auto">×</button></div>
+          <div class="vehicle-photo-frame"><img id="vehicle-photo" alt="Recorte del auto" hidden><p id="vehicle-image-status" role="status"></p></div>
+          <dl id="vehicle-info"></dl>
+          <p id="vehicle-detail-message" class="small-note"></p>
+        </aside>
+      </div>
+      <footer class="page-footer"><span data-icon="info"></span><span>Consultar un auto no lo reserva para despacho.</span><span class="version">UI 01 / PATIO</span></footer>
+    </main>
+  </div>
+  <dialog id="pending-dialog" aria-labelledby="pending-title"><span class="dialog-icon" data-icon="layers"></span><h2 id="pending-title">Próxima pantalla</h2><p id="pending-description"></p><button id="close-dialog" class="button primary">Volver al patio</button></dialog>
+</body>
+</html>
