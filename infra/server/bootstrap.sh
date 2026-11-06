@@ -32,6 +32,7 @@ chown -R yard:yard /var/lib/yard
 [ -f /etc/yard/yard.env ] || cat > /etc/yard/yard.env <<ENVF
 YARD_BUCKET=$YARD_BUCKET
 YARD_ORIGIN_SECRET_ID=$YARD_ORIGIN_SECRET_ID
+ANTHROPIC_SECRET_ID=$ANTHROPIC_SECRET_ID
 YARD_ENTRYPOINT=compartir_ui.py
 ENVF
 

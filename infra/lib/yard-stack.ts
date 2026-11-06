@@ -84,6 +84,7 @@ export class YardStack extends cdk.Stack {
     userData.addCommands(
       `export YARD_BUCKET=${bucket.bucketName}`,
       `export YARD_ORIGIN_SECRET_ID=${originSecret.secretArn}`,
+      `export ANTHROPIC_SECRET_ID=${anthropicKey.secretName}`,
       fs.readFileSync(path.join(__dirname, '..', 'server', 'bootstrap.sh'), 'utf8'),
     );
 

@@ -174,9 +174,44 @@ def parsear_local(texto, inventario):
     return {"cantidad": cantidad, "modelo": modelo, "color": color, "lote": lote}
 
 
-def parsear_criterios(texto, inventario):
+_API_KEY_CACHE = None  # cache del valor leído de Secrets Manager
+
+
+def _key_desde_secrets():
+    """Lee la API key desde AWS Secrets Manager si ANTHROPIC_SECRET_ID está seteado.
+    En EC2 usa el rol de la instancia; en local, las credenciales de AWS del equipo."""
+    secret_id = os.environ.get("ANTHROPIC_SECRET_ID")
+    if not secret_id:
+        return None
+    try:
+        import boto3  # lazy: solo si hay un secret configurado
+        region = (os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "us-east-1")
+        cli = boto3.client("secretsmanager", region_name=region)
+        val = (cli.get_secret_value(SecretId=secret_id).get("SecretString") or "").strip()
+        if val.startswith("{"):  # el secret puede ser {"ANTHROPIC_API_KEY": "sk-..."} o el valor crudo
+            import json as _json
+            data = _json.loads(val)
+            return data.get("ANTHROPIC_API_KEY") or data.get("api_key") or next(iter(data.values()), None)
+        return val or None
+    except Exception as e:
+        print("[despacho] No se pudo leer el secret de Anthropic:", e)
+        return None
+
+
+def obtener_api_key(base):
+    """Resuelve la API key en orden: variable de entorno → .env → Secrets Manager."""
+    global _API_KEY_CACHE
+    cargar_env(base)
+    env = os.environ.get("ANTHROPIC_API_KEY")
+    if env and env != "TU_API_KEY_AQUI":
+        return env
+    if _API_KEY_CACHE is None:
+        _API_KEY_CACHE = _key_desde_secrets() or ""
+    return _API_KEY_CACHE or None
+
+
+def parsear_criterios(texto, inventario, key=None):
     """Devuelve (criterios, modo) donde modo es 'ia' o 'local'."""
-    key = os.environ.get("ANTHROPIC_API_KEY")
     if key and key != "TU_API_KEY_AQUI":
         try:
             return parsear_llm(texto, key), "ia"
@@ -229,9 +264,9 @@ def planificar(base, texto):
     if not texto:
         return {"ok": False, "error": "Escribí qué autos buscás."}
 
-    cargar_env(base)  # toma la API key del .env si existe (y no está ya en el entorno)
+    key = obtener_api_key(base)  # entorno → .env → Secrets Manager
     inventario = leer_inventario(base)
-    crit, modo = parsear_criterios(texto, inventario)
+    crit, modo = parsear_criterios(texto, inventario, key)
 
     # Sin filtros reconocidos: no vaciamos el patio entero salvo que pidan "todos".
     tiene_filtro = bool(_norm(crit.get("modelo")) or crit.get("color") or crit.get("lote"))
