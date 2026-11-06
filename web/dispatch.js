@@ -69,6 +69,48 @@ function render(data) {
       ol.append(li);
     });
     result.append(ol);
+
+    // Confirmar: crea la orden de retiro que consumirá la PWA del chofer.
+    const acciones = el('div', 'chat-order');
+    const generar = el('button', 'button primary', `Generar orden de retiro (${data.ruta.length})`);
+    generar.type = 'button';
+    const estado = el('p', 'chat-order-status');
+    generar.addEventListener('click', () => crearOrden(data, generar, estado));
+    acciones.append(generar, estado);
+    result.append(acciones);
+  }
+}
+
+async function crearOrden(data, boton, estado) {
+  boton.disabled = true;
+  estado.textContent = 'Generando orden…';
+  estado.className = 'chat-order-status';
+  try {
+    const resp = await fetch('/api/despacho/orden', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        autos: data.ruta.map(a => a.id),   // en orden de recorrido
+        consulta: data.consulta || '',
+      }),
+    });
+    const r = await resp.json();
+    if (!r.ok) {
+      estado.textContent = r.error || 'No se pudo generar la orden.';
+      estado.className = 'chat-order-status error';
+      boton.disabled = false;
+      return;
+    }
+    estado.className = 'chat-order-status ok';
+    estado.replaceChildren(
+      el('span', null, `Orden ${r.orden.codigo} generada (${r.orden.total} autos). `),
+      Object.assign(el('a', null, 'Abrir app del chofer →'), {href: '/pwa/', target: '_blank', rel: 'noopener'}),
+    );
+    boton.textContent = 'Orden generada ✓';
+  } catch (e) {
+    estado.textContent = 'No se pudo contactar el servidor.';
+    estado.className = 'chat-order-status error';
+    boton.disabled = false;
   }
 }
 

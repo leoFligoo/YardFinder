@@ -17,6 +17,7 @@ import datetime as dt
 import errno
 import json
 import mimetypes
+import os
 import re
 import sqlite3
 import subprocess
@@ -28,6 +29,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 import despacho
+import ordenes
 try:
     import procesar_vuelo as pv
 except ImportError:
@@ -36,7 +38,7 @@ except ImportError:
     pv = None
 from inventario_ui import InventarioError, leer_patio, leer_inventario, resolver_recorte
 
-PUERTO = 8765
+PUERTO = int(os.environ.get("YARD_PUERTO", "8765"))
 BASE = pv.BASE if pv else Path(__file__).resolve().parent
 HFOV_PRINCIPAL = pv.HFOV_PRINCIPAL if pv else 71.6
 SALIDA = BASE / "salida"
@@ -260,8 +262,12 @@ class Manejador(BaseHTTPRequestHandler):
             return self._archivo(BASE / "interfaz.html")
         if ruta in {"/ui", "/ui/"}:
             return self._archivo(BASE / "web" / "index.html")
+        if ruta in {"/pwa", "/pwa/"}:
+            return self._archivo(BASE / "PWA" / "index.html")
+        if ruta == "/api/despacho/orden/activa":
+            return self._json({"orden": ordenes.orden_activa(BASE)})
         # Montajes acotados: nunca servir la raíz del proyecto ni listar directorios.
-        for prefijo, carpeta in (("/ui/", "web"), ("/vendor/", "vendor"),
+        for prefijo, carpeta in (("/ui/", "web"), ("/pwa/", "PWA"), ("/vendor/", "vendor"),
                                  ("/demo-assets/", "ejemplo_resultado")):
             if ruta.startswith(prefijo):
                 raiz = (BASE / carpeta).resolve()
@@ -310,6 +316,28 @@ class Manejador(BaseHTTPRequestHandler):
             except sqlite3.Error:
                 return self._json({"error": "No se pudo leer el inventario."}, 503)
             return self._json(res, 200 if res.get("ok") else 400)
+        if ruta == "/api/despacho/orden":
+            # El operador confirma el despacho: crea la orden de retiro.
+            try:
+                res = ordenes.crear_orden(
+                    BASE, datos.get("autos", []), consulta=datos.get("consulta", ""),
+                    destino=datos.get("destino"), transportista=datos.get("transportista"))
+            except sqlite3.Error:
+                return self._json({"error": "No se pudo escribir la orden."}, 503)
+            return self._json(res, 200 if res.get("ok") else 400)
+        if ruta == "/api/despacho/retiro":
+            # La PWA marca un auto como retirado (por tag o auto_id).
+            try:
+                res = ordenes.marcar_retiro(BASE, tag=datos.get("tag"), auto_id=datos.get("auto_id"))
+            except sqlite3.Error:
+                return self._json({"error": "No se pudo registrar el retiro."}, 503)
+            return self._json(res, 200 if res.get("ok") else 400)
+        if ruta == "/api/despacho/orden/completar":
+            try:
+                res = ordenes.completar_orden(BASE)
+            except sqlite3.Error:
+                return self._json({"error": "No se pudo completar la orden."}, 503)
+            return self._json(res, 200 if res.get("ok") else 400)
         self.send_error(404)
 
 
@@ -321,6 +349,10 @@ class Servidor(ThreadingHTTPServer):
 
 def main():
     url = f"http://127.0.0.1:{PUERTO}/ui/#/patio"
+    try:
+        ordenes.asegurar_esquema(BASE)  # crea tablas/columnas de órdenes si faltan
+    except sqlite3.Error as e:
+        print(f"Aviso: no se pudo preparar el esquema de órdenes: {e}")
     try:
         servidor = Servidor(("127.0.0.1", PUERTO), Manejador)
     except OSError as e:
