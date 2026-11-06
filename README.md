@@ -26,9 +26,10 @@ No requiere instalar paquetes ni compilar el frontend.
 **4 columnas × 5 filas**. Los autos se dibujan en horizontal y cada lote tiene una calle
 izquierda, una central entre las columnas 2 y 3, y una derecha. Tres calles transversales
 conectan los lotes y los accesos señalizados de **Entrada** y **Salida**.
+Cada lote está delimitado por un único contorno verde sin relleno, que incluye la calle central.
 
 - Cada lote muestra «20 disponibles». Los contadores se calculan de esta distribución de ejemplo.
-- Click, Enter o Espacio sobre un auto consulta su lote, columna y fila; no lo reserva para despacho.
+- Click, Enter o Espacio sobre un auto abre su ficha lateral: recorte, coordenadas, sector, Tag, VIN, patente, modelo, color y confianza. La consulta no lo reserva para despacho. En móvil la ficha aparece debajo del plano; cerrar restaura la vista completa.
 - Zoom con +/−, desplazamiento por arrastre al acercar y «Ver todo» para restaurar el plano.
 - `x` es la columna (1–4), `y` la fila (1–5), con origen arriba a la izquierda de cada lote.
   Ejemplo: `Lote 3 · (2,4)`, ID `L3-X2-Y4`.
@@ -42,8 +43,12 @@ ni coordenadas GPS**. La red es conceptual y bidireccional; no modela todavía r
 sentidos únicos ni restricciones físicas de un camión.
 
 La disponibilidad es simulada: todas las posiciones del ejemplo están disponibles.
-Esta vista no consulta `inventario.db` ni el snapshot de 123 detecciones. La integración con
-el inventario real y el cálculo/dibujo del recorrido quedan pendientes. Los archivos originales,
+El plano no consulta `inventario.db`. Al abrir la ficha se lee `web/data/patio.json` y se asocian
+las posiciones a los IDs 1–120 del ejemplo, en orden por lote, fila y columna. Esta asociación
+es **simulada**, no una vinculación inferida por GPS: la ficha lo indica y distingue el lote del
+plano del sector original de la observación. Se muestran los recortes y atributos originales;
+los datos ausentes no se inventan. Cerrar o cambiar rápidamente de posición ignora respuestas
+pendientes de la ficha anterior. La integración con el inventario real y el recorrido quedan pendientes. Los archivos originales,
 ortofotos y el mapa de resultados siguen disponibles en el flujo anterior del servidor (`/`).
 
 Solo Patio está implementado en esta entrega. Los accesos restantes explican que están pendientes;
@@ -87,7 +92,8 @@ seleccionados superpuestos. También están disponibles como [ZIP](output/imageg
 | `web/yard-layout.js` | Generador y plano SVG interactivo de 6 lotes × 20 posiciones |
 | `web/yard-geometry.js` | Calles, entrada/salida y red de circulación compartida con futuras rutas |
 | `web/vehicle-list.js` | Componente reservado para coincidencias del chat; no montado en Patio |
-| `web/data/patio.json` | Snapshot histórico de observaciones; no consumido por el Patio actual |
+| `web/vehicle-detail.js` | Ficha, carga de observaciones y asociación explícita para la demo |
+| `web/data/patio.json` | Snapshot histórico de observaciones usado por las fichas |
 | `plantilla_mapa.html` | Mapa y buscador de vehículos |
 | `interfaz.py` | Servidor local y API |
 | `vendor/leaflet/` | Biblioteca y recursos del mapa offline |

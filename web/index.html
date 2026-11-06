@@ -34,7 +34,16 @@
         <article class="stat"><div class="stat-icon" data-icon="car"></div><div><strong id="per-lot-count">—</strong><span>Posiciones por lote</span></div></article>
         <article class="stat"><div class="stat-icon" data-icon="arrow"></div><div><strong id="access-count">—</strong><span>Entrada y salida</span></div></article>
       </section>
-      <section id="yard-layout" aria-label="Distribución interactiva del patio"></section>
+      <div id="yard-and-detail" class="yard-and-detail">
+        <section id="yard-layout" aria-label="Distribución interactiva del patio"></section>
+        <aside id="vehicle-card" class="panel vehicle-card yard-vehicle-card" aria-labelledby="vehicle-title" hidden>
+          <div class="card-heading"><h2 id="vehicle-title">Auto</h2><button id="close-vehicle-detail" class="icon-button" aria-label="Cerrar ficha del auto">×</button></div>
+          <div class="vehicle-photo-frame"><img id="vehicle-photo" alt="Recorte del auto" hidden><p id="vehicle-image-status" role="status"></p></div>
+          <dl id="vehicle-info"></dl>
+          <p id="vehicle-detail-message" class="small-note"></p>
+          <button id="vehicle-detail-retry" class="button outline" hidden>Reintentar</button>
+        </aside>
+      </div>
       <footer class="page-footer"><span data-icon="info"></span><span>Distribución de ejemplo · Consultar una posición no la reserva para despacho.</span><span class="version">UI 01 / PATIO</span></footer>
     </main>
   </div>

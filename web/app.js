@@ -1,11 +1,18 @@
 import {renderIcons} from './icons.js';
 import {renderYardLayout} from './yard-layout.js';
+import {createVehicleDetail} from './vehicle-detail.js';
 
 const $ = id => document.getElementById(id);
 const text = (id, value) => { $(id).textContent = value; };
 renderIcons();
+let board;
+const vehicleDetail = createVehicleDetail({onClose: () => board?.clearSelection()});
 try {
-  const {yard, geometry} = renderYardLayout($('yard-layout'));
+  board = renderYardLayout($('yard-layout'), {
+    onSelect: position => vehicleDetail.show(position),
+    onClear: () => vehicleDetail.hide(),
+  });
+  const {yard, geometry} = board;
   text('available-count', geometry.positions.filter(p => p.available).length);
   text('lot-count', yard.lots.length);
   text('per-lot-count', yard.lots[0].capacity);

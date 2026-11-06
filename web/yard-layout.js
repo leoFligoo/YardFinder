@@ -35,7 +35,7 @@ function svgNode(name, attributes = {}, text) {
   return node;
 }
 
-export function renderYardLayout(container) {
+export function renderYardLayout(container, {onSelect = () => {}, onClear = () => {}} = {}) {
   const yard = generateYard();
   const geometry = buildYardGeometry(yard);
   container.innerHTML = `
@@ -88,9 +88,7 @@ export function renderYardLayout(container) {
   svg.append(roadLayer);
   for (const lot of geometry.lots) {
     const layer = svgNode('g', {'data-lot-id': lot.id, class: 'yard-lot'});
-    for (const offset of [26, 196]) {
-      layer.append(svgNode('rect', {x: lot.left + offset, y: lot.top + 124, width: 128, height: 269, rx: 9, class: 'yard-parking-block'}));
-    }
+    layer.append(svgNode('rect', {x: lot.left + 26, y: lot.top + 124, width: 298, height: 269, rx: 9, class: 'yard-lot-outline'}));
     layer.append(svgNode('text', {x: lot.left + 34, y: lot.top + 147, class: 'yard-lot-title'}, `LOTE ${String(lot.id).padStart(2, '0')}`));
     layer.append(svgNode('text', {x: lot.left + 204, y: lot.top + 147, class: 'yard-lot-count'}, `${lot.positions.filter(p => p.available).length} disponibles`));
     for (const position of lot.positions) {
@@ -106,6 +104,7 @@ export function renderYardLayout(container) {
         container.querySelector('#yard-position-title').textContent = `Lote ${lot.id} · (${position.x}, ${position.y})`;
         container.querySelector('#yard-position-description').textContent = `Disponible · Columna ${position.x}, fila ${position.y} · ${position.id}`;
         container.querySelector('#yard-clear').hidden = false;
+        onSelect(position);
       };
       group.addEventListener('click', select);
       group.addEventListener('keydown', event => {
@@ -150,12 +149,16 @@ export function renderYardLayout(container) {
   container.querySelector('#yard-zoom-in').addEventListener('click', () => setZoom(zoom + .5));
   container.querySelector('#yard-zoom-out').addEventListener('click', () => setZoom(zoom - .5));
   container.querySelector('#yard-reset').addEventListener('click', () => setZoom(1));
-  container.querySelector('#yard-clear').addEventListener('click', () => {
+  const clearSelection = () => {
+    const selected = svg.querySelector('.yard-car[aria-pressed="true"]');
     svg.querySelectorAll('.yard-car[aria-pressed="true"]').forEach(el => el.setAttribute('aria-pressed', 'false'));
     container.querySelector('#yard-position-title').textContent = 'Consultá una posición';
     container.querySelector('#yard-position-description').textContent = 'Seleccioná un auto del plano para ver su lote y coordenadas.';
     container.querySelector('#yard-clear').hidden = true;
-  });
+    onClear();
+    selected?.focus({preventScroll: true});
+  };
+  container.querySelector('#yard-clear').addEventListener('click', clearSelection);
   let drag = null;
   svg.addEventListener('pointerdown', event => {
     if (zoom === 1 || event.button !== 0 || event.target.closest('.yard-car')) return;
@@ -180,5 +183,5 @@ export function renderYardLayout(container) {
     }
   });
   applyView();
-  return {yard, geometry};
+  return {yard, geometry, clearSelection};
 }

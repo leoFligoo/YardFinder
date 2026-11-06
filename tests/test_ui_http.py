@@ -29,7 +29,7 @@ class UIHTTPTests(unittest.TestCase):
 
     def test_ui_and_every_referenced_asset_are_local_and_available(self):
         paths = ['/ui', '/ui/', '/ui/app.js', '/ui/styles.css', '/ui/yard-geometry.js',
-                 '/ui/icons.js', '/ui/state.js', '/ui/data.js', '/ui/yard-layout.js', '/ui/vehicle-list.js', '/ui/favicon.svg',
+                 '/ui/icons.js', '/ui/state.js', '/ui/data.js', '/ui/yard-layout.js', '/ui/vehicle-list.js', '/ui/vehicle-detail.js', '/ui/favicon.svg',
                  '/vendor/leaflet/leaflet.js', '/vendor/leaflet/leaflet.css']
         page = self.get('/ui/')[2].decode()
         self.assertNotIn('vehicle-list-panel', page)

@@ -1704,10 +1704,11 @@ dialog p {
   stroke-dasharray: 9 11;
   opacity: .7;
 }
-.yard-parking-block {
-  fill: #192a29;
-  stroke: #36554c;
-  stroke-width: 1;
+.yard-lot-outline {
+  fill: none;
+  stroke: #4e8a6e;
+  stroke-width: 1.2;
+  pointer-events: none;
 }
 .yard-lot-title {
   fill: #e4ecec;
@@ -1853,5 +1854,69 @@ dialog p {
   }
   .yard-legend {
     gap: 12px;
+  }
+}
+
+.yard-and-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+.yard-and-detail.has-vehicle-detail {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+.yard-vehicle-card {
+  padding: 20px;
+  position: sticky;
+  top: 20px;
+}
+.yard-vehicle-card h2 {
+  font-size: 20px;
+}
+.vehicle-photo-frame {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #0e151c;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.yard-vehicle-card img {
+  height: 180px;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  object-fit: contain;
+}
+#vehicle-image-status {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px;
+  margin: 0;
+}
+.yard-vehicle-card dl>div {
+  margin: 12px 0;
+}
+.yard-vehicle-card .small-note {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 18px;
+}
+.yard-vehicle-card .button {
+  margin-top: 14px;
+}
+@media (max-width: 980px) {
+  .yard-and-detail.has-vehicle-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .yard-vehicle-card {
+    position: static;
+  }
+  .yard-vehicle-card img, .vehicle-photo-frame {
+    min-height: 220px;
   }
 }
